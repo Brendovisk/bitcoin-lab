@@ -173,4 +173,32 @@
     50% { box-shadow: 0 0 30px -5px oklch(0.78 0.16 60 / 0.4); }
   }
   .animate-block { animation: block-pulse 4s ease-in-out infinite; }
+
+  @keyframes hash-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+  .animate-hash { animation: hash-flicker 2.4s ease-in-out infinite; }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-up { animation: fade-up 0.45s ease-out both; }
+
+  @keyframes glow-signal {
+    0%, 100% { box-shadow: 0 0 0 0 oklch(0.78 0.18 145 / 0); }
+    50%      { box-shadow: 0 0 18px -2px oklch(0.78 0.18 145 / 0.5); }
+  }
+  .animate-glow-signal { animation: glow-signal 2.4s ease-in-out infinite; }
+
+  .grid-faint {
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .text-signal-glow { color: var(--signal); text-shadow: 0 0 12px oklch(0.78 0.18 145 / 0.5); }
+  .text-bitcoin-glow { color: var(--bitcoin); text-shadow: 0 0 14px oklch(0.78 0.16 60 / 0.5); }
 }
