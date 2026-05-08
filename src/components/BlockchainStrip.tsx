@@ -8,10 +8,10 @@ type Block = {
   time: string;
 };
 
+const HEX = "0123456789abcdef";
 function rand(len: number) {
-  const c = "0123456789abcdef";
   let s = "";
-  for (let i = 0; i < len; i++) s += c[Math.floor(Math.random() * 16)];
+  for (let i = 0; i < len; i++) s += HEX[Math.floor(Math.random() * 16)];
   return s;
 }
 
@@ -26,13 +26,12 @@ function makeBlock(h: number): Block {
 }
 
 export function BlockchainStrip() {
-  const [blocks, setBlocks] = useState<Block[]>(() =>
-    Array.from({ length: 5 }, (_, i) => makeBlock(840219 - i))
-  );
+  const [blocks, setBlocks] = useState<Block[]>([]);
 
   useEffect(() => {
+    setBlocks(Array.from({ length: 5 }, (_, i) => makeBlock(840219 - i)));
     const id = setInterval(() => {
-      setBlocks((b) => [makeBlock(b[0].height + 1), ...b.slice(0, 4)]);
+      setBlocks((b) => (b.length ? [makeBlock(b[0].height + 1), ...b.slice(0, 4)] : b));
     }, 8000);
     return () => clearInterval(id);
   }, []);
@@ -47,15 +46,16 @@ export function BlockchainStrip() {
         <div className="font-mono text-[11px] text-signal pulse-dot">sincronizado</div>
       </div>
 
-      <div className="flex items-stretch gap-2 overflow-x-auto pb-2">
+      <div className="flex items-stretch gap-2 overflow-x-auto pb-2 min-h-[170px]">
+        {blocks.length === 0 && (
+          <div className="font-mono text-xs text-muted-foreground/60 self-center">conectando ao nó…</div>
+        )}
         {blocks.map((b, i) => (
-          <div key={b.height} className="relative flex items-center shrink-0">
-            <div
-              className={`w-44 border ${i === 0 ? "border-bitcoin animate-block" : "border-border"} bg-background/80 p-3`}
-            >
+          <div key={b.height} className="relative flex items-center shrink-0 animate-fade-up">
+            <div className={`w-44 border ${i === 0 ? "border-bitcoin animate-block" : "border-border"} bg-background/80 p-3`}>
               <div className="font-mono text-[10px] text-muted-foreground tracking-widest">BLOCK</div>
               <div className="font-mono text-bitcoin text-lg">#{b.height.toLocaleString()}</div>
-              <div className="font-mono text-[10px] text-muted-foreground truncate mt-2">{b.hash.slice(0, 26)}…</div>
+              <div className="font-mono text-[10px] text-muted-foreground truncate mt-2 animate-hash">{b.hash.slice(0, 26)}…</div>
               <div className="mt-3 grid grid-cols-2 gap-1 font-mono text-[10px]">
                 <div className="text-muted-foreground">txs</div>
                 <div className="text-right">{b.txs}</div>
@@ -65,9 +65,7 @@ export function BlockchainStrip() {
                 <div className="text-right">{b.time}</div>
               </div>
             </div>
-            {i < blocks.length - 1 && (
-              <div className="text-border font-mono px-1">←</div>
-            )}
+            {i < blocks.length - 1 && <div className="text-border font-mono px-1">←</div>}
           </div>
         ))}
       </div>

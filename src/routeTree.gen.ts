@@ -11,8 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LabRouteImport } from './routes/lab'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LabWalletsRouteImport } from './routes/lab.wallets'
+import { Route as LabUtxosRouteImport } from './routes/lab.utxos'
+import { Route as LabTransactionsRouteImport } from './routes/lab.transactions'
+import { Route as LabNetworksRouteImport } from './routes/lab.networks'
+import { Route as LabMiningRouteImport } from './routes/lab.mining'
 import { Route as LabMempoolRouteImport } from './routes/lab.mempool'
+import { Route as LabChallengesRouteImport } from './routes/lab.challenges'
 import { Route as LabBlockchainRouteImport } from './routes/lab.blockchain'
+import { Route as LabBitcoinCoreRouteImport } from './routes/lab.bitcoin-core'
 
 const LabRoute = LabRouteImport.update({
   id: '/lab',
@@ -24,9 +31,39 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabWalletsRoute = LabWalletsRouteImport.update({
+  id: '/wallets',
+  path: '/wallets',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabUtxosRoute = LabUtxosRouteImport.update({
+  id: '/utxos',
+  path: '/utxos',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabTransactionsRoute = LabTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabNetworksRoute = LabNetworksRouteImport.update({
+  id: '/networks',
+  path: '/networks',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabMiningRoute = LabMiningRouteImport.update({
+  id: '/mining',
+  path: '/mining',
+  getParentRoute: () => LabRoute,
+} as any)
 const LabMempoolRoute = LabMempoolRouteImport.update({
   id: '/mempool',
   path: '/mempool',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabChallengesRoute = LabChallengesRouteImport.update({
+  id: '/challenges',
+  path: '/challenges',
   getParentRoute: () => LabRoute,
 } as any)
 const LabBlockchainRoute = LabBlockchainRouteImport.update({
@@ -34,32 +71,92 @@ const LabBlockchainRoute = LabBlockchainRouteImport.update({
   path: '/blockchain',
   getParentRoute: () => LabRoute,
 } as any)
+const LabBitcoinCoreRoute = LabBitcoinCoreRouteImport.update({
+  id: '/bitcoin-core',
+  path: '/bitcoin-core',
+  getParentRoute: () => LabRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/lab': typeof LabRouteWithChildren
+  '/lab/bitcoin-core': typeof LabBitcoinCoreRoute
   '/lab/blockchain': typeof LabBlockchainRoute
+  '/lab/challenges': typeof LabChallengesRoute
   '/lab/mempool': typeof LabMempoolRoute
+  '/lab/mining': typeof LabMiningRoute
+  '/lab/networks': typeof LabNetworksRoute
+  '/lab/transactions': typeof LabTransactionsRoute
+  '/lab/utxos': typeof LabUtxosRoute
+  '/lab/wallets': typeof LabWalletsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/lab': typeof LabRouteWithChildren
+  '/lab/bitcoin-core': typeof LabBitcoinCoreRoute
   '/lab/blockchain': typeof LabBlockchainRoute
+  '/lab/challenges': typeof LabChallengesRoute
   '/lab/mempool': typeof LabMempoolRoute
+  '/lab/mining': typeof LabMiningRoute
+  '/lab/networks': typeof LabNetworksRoute
+  '/lab/transactions': typeof LabTransactionsRoute
+  '/lab/utxos': typeof LabUtxosRoute
+  '/lab/wallets': typeof LabWalletsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/lab': typeof LabRouteWithChildren
+  '/lab/bitcoin-core': typeof LabBitcoinCoreRoute
   '/lab/blockchain': typeof LabBlockchainRoute
+  '/lab/challenges': typeof LabChallengesRoute
   '/lab/mempool': typeof LabMempoolRoute
+  '/lab/mining': typeof LabMiningRoute
+  '/lab/networks': typeof LabNetworksRoute
+  '/lab/transactions': typeof LabTransactionsRoute
+  '/lab/utxos': typeof LabUtxosRoute
+  '/lab/wallets': typeof LabWalletsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/lab' | '/lab/blockchain' | '/lab/mempool'
+  fullPaths:
+    | '/'
+    | '/lab'
+    | '/lab/bitcoin-core'
+    | '/lab/blockchain'
+    | '/lab/challenges'
+    | '/lab/mempool'
+    | '/lab/mining'
+    | '/lab/networks'
+    | '/lab/transactions'
+    | '/lab/utxos'
+    | '/lab/wallets'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/lab' | '/lab/blockchain' | '/lab/mempool'
-  id: '__root__' | '/' | '/lab' | '/lab/blockchain' | '/lab/mempool'
+  to:
+    | '/'
+    | '/lab'
+    | '/lab/bitcoin-core'
+    | '/lab/blockchain'
+    | '/lab/challenges'
+    | '/lab/mempool'
+    | '/lab/mining'
+    | '/lab/networks'
+    | '/lab/transactions'
+    | '/lab/utxos'
+    | '/lab/wallets'
+  id:
+    | '__root__'
+    | '/'
+    | '/lab'
+    | '/lab/bitcoin-core'
+    | '/lab/blockchain'
+    | '/lab/challenges'
+    | '/lab/mempool'
+    | '/lab/mining'
+    | '/lab/networks'
+    | '/lab/transactions'
+    | '/lab/utxos'
+    | '/lab/wallets'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -83,11 +180,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lab/wallets': {
+      id: '/lab/wallets'
+      path: '/wallets'
+      fullPath: '/lab/wallets'
+      preLoaderRoute: typeof LabWalletsRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/utxos': {
+      id: '/lab/utxos'
+      path: '/utxos'
+      fullPath: '/lab/utxos'
+      preLoaderRoute: typeof LabUtxosRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/transactions': {
+      id: '/lab/transactions'
+      path: '/transactions'
+      fullPath: '/lab/transactions'
+      preLoaderRoute: typeof LabTransactionsRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/networks': {
+      id: '/lab/networks'
+      path: '/networks'
+      fullPath: '/lab/networks'
+      preLoaderRoute: typeof LabNetworksRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/mining': {
+      id: '/lab/mining'
+      path: '/mining'
+      fullPath: '/lab/mining'
+      preLoaderRoute: typeof LabMiningRouteImport
+      parentRoute: typeof LabRoute
+    }
     '/lab/mempool': {
       id: '/lab/mempool'
       path: '/mempool'
       fullPath: '/lab/mempool'
       preLoaderRoute: typeof LabMempoolRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/challenges': {
+      id: '/lab/challenges'
+      path: '/challenges'
+      fullPath: '/lab/challenges'
+      preLoaderRoute: typeof LabChallengesRouteImport
       parentRoute: typeof LabRoute
     }
     '/lab/blockchain': {
@@ -97,17 +236,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LabBlockchainRouteImport
       parentRoute: typeof LabRoute
     }
+    '/lab/bitcoin-core': {
+      id: '/lab/bitcoin-core'
+      path: '/bitcoin-core'
+      fullPath: '/lab/bitcoin-core'
+      preLoaderRoute: typeof LabBitcoinCoreRouteImport
+      parentRoute: typeof LabRoute
+    }
   }
 }
 
 interface LabRouteChildren {
+  LabBitcoinCoreRoute: typeof LabBitcoinCoreRoute
   LabBlockchainRoute: typeof LabBlockchainRoute
+  LabChallengesRoute: typeof LabChallengesRoute
   LabMempoolRoute: typeof LabMempoolRoute
+  LabMiningRoute: typeof LabMiningRoute
+  LabNetworksRoute: typeof LabNetworksRoute
+  LabTransactionsRoute: typeof LabTransactionsRoute
+  LabUtxosRoute: typeof LabUtxosRoute
+  LabWalletsRoute: typeof LabWalletsRoute
 }
 
 const LabRouteChildren: LabRouteChildren = {
+  LabBitcoinCoreRoute: LabBitcoinCoreRoute,
   LabBlockchainRoute: LabBlockchainRoute,
+  LabChallengesRoute: LabChallengesRoute,
   LabMempoolRoute: LabMempoolRoute,
+  LabMiningRoute: LabMiningRoute,
+  LabNetworksRoute: LabNetworksRoute,
+  LabTransactionsRoute: LabTransactionsRoute,
+  LabUtxosRoute: LabUtxosRoute,
+  LabWalletsRoute: LabWalletsRoute,
 }
 
 const LabRouteWithChildren = LabRoute._addFileChildren(LabRouteChildren)

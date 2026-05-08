@@ -8,18 +8,18 @@ export function SiteHeader() {
         <Link to="/" className="hover:opacity-80 transition-opacity">
           <Logo />
         </Link>
-        <nav className="flex items-center gap-8 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+        <nav className="flex items-center gap-7 font-mono text-xs uppercase tracking-widest text-muted-foreground">
           <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground" }} className="hover:text-foreground transition-colors">
             Manifesto
           </Link>
           <Link to="/lab" activeProps={{ className: "text-foreground" }} className="hover:text-foreground transition-colors">
             Laboratório
           </Link>
-          <Link to="/lab/blockchain" activeProps={{ className: "text-foreground" }} className="hover:text-foreground transition-colors">
-            Blockchain
+          <Link to="/lab/bitcoin-core" activeProps={{ className: "text-foreground" }} className="hover:text-foreground transition-colors">
+            Console
           </Link>
-          <Link to="/lab/mempool" activeProps={{ className: "text-foreground" }} className="hover:text-foreground transition-colors">
-            Mempool
+          <Link to="/lab/challenges" activeProps={{ className: "text-foreground" }} className="hover:text-foreground transition-colors">
+            Desafios
           </Link>
         </nav>
         <div className="flex items-center gap-3 font-mono text-[11px] text-muted-foreground">
