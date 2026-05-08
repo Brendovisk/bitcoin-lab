@@ -9,38 +9,81 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LabRouteImport } from './routes/lab'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LabIndexRouteImport } from './routes/lab.index'
+import { Route as LabMempoolRouteImport } from './routes/lab.mempool'
+import { Route as LabBlockchainRouteImport } from './routes/lab.blockchain'
 
+const LabRoute = LabRouteImport.update({
+  id: '/lab',
+  path: '/lab',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabIndexRoute = LabIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabMempoolRoute = LabMempoolRouteImport.update({
+  id: '/mempool',
+  path: '/mempool',
+  getParentRoute: () => LabRoute,
+} as any)
+const LabBlockchainRoute = LabBlockchainRouteImport.update({
+  id: '/blockchain',
+  path: '/blockchain',
+  getParentRoute: () => LabRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/lab': typeof LabRouteWithChildren
+  '/lab/blockchain': typeof LabBlockchainRoute
+  '/lab/mempool': typeof LabMempoolRoute
+  '/lab/': typeof LabIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/lab/blockchain': typeof LabBlockchainRoute
+  '/lab/mempool': typeof LabMempoolRoute
+  '/lab': typeof LabIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/lab': typeof LabRouteWithChildren
+  '/lab/blockchain': typeof LabBlockchainRoute
+  '/lab/mempool': typeof LabMempoolRoute
+  '/lab/': typeof LabIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/lab' | '/lab/blockchain' | '/lab/mempool' | '/lab/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/lab/blockchain' | '/lab/mempool' | '/lab'
+  id: '__root__' | '/' | '/lab' | '/lab/blockchain' | '/lab/mempool' | '/lab/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LabRoute: typeof LabRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/lab': {
+      id: '/lab'
+      path: '/lab'
+      fullPath: '/lab'
+      preLoaderRoute: typeof LabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +91,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lab/': {
+      id: '/lab/'
+      path: '/'
+      fullPath: '/lab/'
+      preLoaderRoute: typeof LabIndexRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/mempool': {
+      id: '/lab/mempool'
+      path: '/mempool'
+      fullPath: '/lab/mempool'
+      preLoaderRoute: typeof LabMempoolRouteImport
+      parentRoute: typeof LabRoute
+    }
+    '/lab/blockchain': {
+      id: '/lab/blockchain'
+      path: '/blockchain'
+      fullPath: '/lab/blockchain'
+      preLoaderRoute: typeof LabBlockchainRouteImport
+      parentRoute: typeof LabRoute
+    }
   }
 }
 
+interface LabRouteChildren {
+  LabBlockchainRoute: typeof LabBlockchainRoute
+  LabMempoolRoute: typeof LabMempoolRoute
+  LabIndexRoute: typeof LabIndexRoute
+}
+
+const LabRouteChildren: LabRouteChildren = {
+  LabBlockchainRoute: LabBlockchainRoute,
+  LabMempoolRoute: LabMempoolRoute,
+  LabIndexRoute: LabIndexRoute,
+}
+
+const LabRouteWithChildren = LabRoute._addFileChildren(LabRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LabRoute: LabRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
