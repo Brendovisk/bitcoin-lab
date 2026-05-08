@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LabRouteImport } from './routes/lab'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as LabIndexRouteImport } from './routes/lab.index'
 import { Route as LabMempoolRouteImport } from './routes/lab.mempool'
 import { Route as LabBlockchainRouteImport } from './routes/lab.blockchain'
 
@@ -24,11 +23,6 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const LabIndexRoute = LabIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => LabRoute,
 } as any)
 const LabMempoolRoute = LabMempoolRouteImport.update({
   id: '/mempool',
@@ -46,13 +40,12 @@ export interface FileRoutesByFullPath {
   '/lab': typeof LabRouteWithChildren
   '/lab/blockchain': typeof LabBlockchainRoute
   '/lab/mempool': typeof LabMempoolRoute
-  '/lab/': typeof LabIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/lab': typeof LabRouteWithChildren
   '/lab/blockchain': typeof LabBlockchainRoute
   '/lab/mempool': typeof LabMempoolRoute
-  '/lab': typeof LabIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -60,14 +53,13 @@ export interface FileRoutesById {
   '/lab': typeof LabRouteWithChildren
   '/lab/blockchain': typeof LabBlockchainRoute
   '/lab/mempool': typeof LabMempoolRoute
-  '/lab/': typeof LabIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/lab' | '/lab/blockchain' | '/lab/mempool' | '/lab/'
+  fullPaths: '/' | '/lab' | '/lab/blockchain' | '/lab/mempool'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/lab/blockchain' | '/lab/mempool' | '/lab'
-  id: '__root__' | '/' | '/lab' | '/lab/blockchain' | '/lab/mempool' | '/lab/'
+  to: '/' | '/lab' | '/lab/blockchain' | '/lab/mempool'
+  id: '__root__' | '/' | '/lab' | '/lab/blockchain' | '/lab/mempool'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -91,13 +83,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lab/': {
-      id: '/lab/'
-      path: '/'
-      fullPath: '/lab/'
-      preLoaderRoute: typeof LabIndexRouteImport
-      parentRoute: typeof LabRoute
-    }
     '/lab/mempool': {
       id: '/lab/mempool'
       path: '/mempool'
@@ -118,13 +103,11 @@ declare module '@tanstack/react-router' {
 interface LabRouteChildren {
   LabBlockchainRoute: typeof LabBlockchainRoute
   LabMempoolRoute: typeof LabMempoolRoute
-  LabIndexRoute: typeof LabIndexRoute
 }
 
 const LabRouteChildren: LabRouteChildren = {
   LabBlockchainRoute: LabBlockchainRoute,
   LabMempoolRoute: LabMempoolRoute,
-  LabIndexRoute: LabIndexRoute,
 }
 
 const LabRouteWithChildren = LabRoute._addFileChildren(LabRouteChildren)
@@ -136,3 +119,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
