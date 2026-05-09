@@ -1,173 +1,315 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-type Step = "select" | "sign" | "broadcast" | "done";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
-const HEX = "0123456789abcdef";
-const rndHex = (n: number) =>
-  Array.from({ length: n }, () => HEX[Math.floor(Math.random() * 16)]).join("");
+function AddressChip({ wallet }: { wallet: string }) {
+  const [address, setAddress] = useState("");
+  const [copied, setCopied] = useState(false);
 
-const POOL = [
-  { id: rndHex(8), sats: 50_000 },
-  { id: rndHex(8), sats: 220_000 },
-  { id: rndHex(8), sats: 130_000 },
-];
+  useEffect(() => {
+    if (!wallet) return;
+    fetch(`${API}/api/wallets/${encodeURIComponent(wallet)}/address`)
+      .then((r) => r.json())
+      .then((d: { address: string }) => setAddress(d.address))
+      .catch(() => {});
+  }, [wallet]);
+
+  function copy() {
+    if (!address) return;
+    void navigator.clipboard.writeText(address);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
+  if (!address) return null;
+
+  return (
+    <button
+      onClick={copy}
+      title="clique para copiar endereço"
+      className="flex items-center gap-2 border border-border/60 bg-card/30 px-3 py-2 hover:border-bitcoin/50 transition-colors group"
+    >
+      <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        endereço
+      </span>
+      <span className="font-mono text-xs text-bitcoin truncate max-w-[260px]">{address}</span>
+      <span className="font-mono text-[10px] text-muted-foreground group-hover:text-bitcoin transition-colors">
+        {copied ? "copiado ✓" : "copiar"}
+      </span>
+    </button>
+  );
+}
+
+type ApiUtxo = {
+  txid: string;
+  vout: number;
+  address: string;
+  amount: number;
+  sats: number;
+  confirmations: number;
+};
+
+type Step = "select" | "sign" | "done";
+
+function utxoKey(u: ApiUtxo) {
+  return `${u.txid}:${u.vout}`;
+}
 
 export function TxBuilder() {
+  const [wallets, setWallets] = useState<string[]>([]);
+  const [wallet, setWallet] = useState("");
+  const [utxos, setUtxos] = useState<ApiUtxo[]>([]);
+  const [loading, setLoading] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
-  const [dest, setDest] = useState("bc1qcaveman000000000000000000000000lab");
-  const [amount, setAmount] = useState(180_000);
+  const [dest, setDest] = useState("");
+  const [amount, setAmount] = useState(0);
   const [feeRate, setFeeRate] = useState(12);
   const [step, setStep] = useState<Step>("select");
   const [txid, setTxid] = useState("");
+  const [error, setError] = useState("");
 
-  const inputs = useMemo(() => POOL.filter((u) => picked.includes(u.id)), [picked]);
+  useEffect(() => {
+    fetch(`${API}/api/wallets`)
+      .then((r) => r.json())
+      .then((d: { wallets: string[] }) => {
+        setWallets(d.wallets);
+        if (d.wallets.length > 0) setWallet(d.wallets[0]);
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!wallet) return;
+    setLoading(true);
+    setPicked([]);
+    fetch(`${API}/api/wallets/${encodeURIComponent(wallet)}/utxos`)
+      .then((r) => r.json())
+      .then((d: { utxos: ApiUtxo[] }) => setUtxos(d.utxos))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [wallet]);
+
+  function refreshUtxos() {
+    if (!wallet) return;
+    fetch(`${API}/api/wallets/${encodeURIComponent(wallet)}/utxos`)
+      .then((r) => r.json())
+      .then((d: { utxos: ApiUtxo[] }) => setUtxos(d.utxos))
+      .catch(() => {});
+  }
+
+  const inputs = useMemo(
+    () => utxos.filter((u) => picked.includes(utxoKey(u))),
+    [picked, utxos],
+  );
   const totalIn = inputs.reduce((s, u) => s + u.sats, 0);
   const vsize = 110 + inputs.length * 68 + 31 * 2;
-  const fee = vsize * feeRate;
-  const change = totalIn - amount - fee;
-  const valid = totalIn >= amount + fee && amount > 0;
+  const estimatedFee = vsize * feeRate;
+  const change = totalIn - amount - estimatedFee;
+  const valid = amount > 0 && dest.length > 10 && step === "select";
 
   function reset() {
     setPicked([]);
     setStep("select");
     setTxid("");
+    setError("");
+    refreshUtxos();
+  }
+
+  async function broadcast() {
+    if (!valid) return;
+    setStep("sign");
+    setError("");
+    try {
+      const res = await fetch(`${API}/api/wallets/${encodeURIComponent(wallet)}/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: dest, amount: amount / 1e8 }),
+      });
+      const data = (await res.json()) as { txid?: string; error?: string };
+      if (!res.ok || !data.txid) throw new Error(data.error ?? "Erro ao transmitir");
+      setTxid(data.txid);
+      setStep("done");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro desconhecido");
+      setStep("select");
+    }
   }
 
   return (
-    <div className="grid grid-cols-12 gap-6">
-      <div className="col-span-7 space-y-4">
-        <Card title="01 · escolha os inputs" desc="Quais pedaços você quer gastar?">
-          <div className="grid grid-cols-3 gap-2">
-            {POOL.map((u) => {
-              const sel = picked.includes(u.id);
-              return (
-                <button
-                  key={u.id}
-                  onClick={() =>
-                    setPicked((p) => (sel ? p.filter((x) => x !== u.id) : [...p, u.id]))
-                  }
-                  className={`p-3 border text-left transition-colors ${sel ? "border-bitcoin bg-bitcoin/10" : "border-border hover:border-bitcoin/40"}`}
-                >
-                  <div className="font-mono text-[10px] text-muted-foreground">utxo</div>
-                  <div className="font-display text-bitcoin text-lg">
-                    {(u.sats / 1e8).toFixed(4)}
-                  </div>
-                  <div className="font-mono text-[10px] text-muted-foreground/70">#{u.id}</div>
-                </button>
-              );
-            })}
-          </div>
-        </Card>
-
-        <Card title="02 · destino e valor" desc="Para onde os sats vão?">
-          <label className="block mb-3">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-              endereço
-            </div>
-            <input
-              value={dest}
-              onChange={(e) => setDest(e.target.value)}
-              className="w-full bg-background border border-border px-3 py-2 font-mono text-xs focus:outline-none focus:border-bitcoin"
-            />
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <label>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-                valor (sats)
-              </div>
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
-                className="w-full bg-background border border-border px-3 py-2 font-mono text-sm focus:outline-none focus:border-bitcoin"
-              />
-            </label>
-            <label>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-                fee rate (sat/vB)
-              </div>
-              <input
-                type="number"
-                value={feeRate}
-                onChange={(e) => setFeeRate(Number(e.target.value))}
-                className="w-full bg-background border border-border px-3 py-2 font-mono text-sm focus:outline-none focus:border-bitcoin"
-              />
-            </label>
-          </div>
-        </Card>
-
-        <Card title="03 · revisar e assinar">
-          <div className="font-mono text-xs space-y-1.5">
-            <Row k="inputs" v={`${inputs.length} · ${totalIn.toLocaleString()} sat`} />
-            <Row k="output destino" v={`${amount.toLocaleString()} sat`} />
-            <Row k="output troco" v={`${Math.max(change, 0).toLocaleString()} sat`} />
-            <Row k="vsize estimado" v={`${vsize} vB`} />
-            <Row k="taxa total" v={`${fee.toLocaleString()} sat`} highlight />
-          </div>
-          <div className="mt-4 flex gap-2">
-            <button
-              disabled={!valid || step === "done"}
-              onClick={() => {
-                setStep("sign");
-                setTimeout(() => {
-                  setTxid(rndHex(64));
-                  setStep("done");
-                }, 1100);
-              }}
-              className={`px-5 py-2.5 font-mono text-xs uppercase tracking-widest transition-colors ${valid && step !== "done" ? "bg-bitcoin text-primary-foreground hover:bg-bitcoin-glow" : "bg-muted text-muted-foreground"}`}
-            >
-              {step === "sign"
-                ? "assinando…"
-                : step === "done"
-                  ? "transmitida ✓"
-                  : "assinar e transmitir"}
-            </button>
-            {step === "done" && (
-              <button
-                onClick={reset}
-                className="px-5 py-2.5 font-mono text-xs uppercase tracking-widest border border-border hover:border-foreground/40"
-              >
-                nova tx
-              </button>
-            )}
-          </div>
-        </Card>
+    <div className="space-y-4">
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          wallet
+        </div>
+        <select
+          value={wallet}
+          onChange={(e) => setWallet(e.target.value)}
+          className="bg-background border border-border px-3 py-1.5 font-mono text-xs focus:outline-none focus:border-bitcoin"
+        >
+          {wallets.length === 0 && <option value="">nenhuma wallet</option>}
+          {wallets.map((w) => (
+            <option key={w} value={w}>
+              {w}
+            </option>
+          ))}
+        </select>
+        {wallet && <AddressChip wallet={wallet} />}
+        {wallet && (
+          <span className="font-mono text-[10px] text-muted-foreground">
+            {utxos.length} utxos · {utxos.reduce((s, u) => s + u.sats, 0).toLocaleString()} sats
+          </span>
+        )}
       </div>
 
-      <aside className="col-span-5 border border-border/70 bg-background/80 p-6 font-mono text-xs">
-        <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-          // raw transaction (preview)
+      <div className="grid grid-cols-12 gap-6">
+        <div className="col-span-7 space-y-4">
+          <Card title="01 · escolha os inputs" desc="Quais pedaços você quer gastar?">
+            {loading && (
+              <div className="font-mono text-xs text-muted-foreground/60">carregando utxos…</div>
+            )}
+            {!loading && utxos.length === 0 && (
+              <div className="font-mono text-xs text-muted-foreground/60">
+                nenhum utxo — aguardando seed da API ou reinicie o servidor
+              </div>
+            )}
+            <div className="grid grid-cols-3 gap-2">
+              {utxos.map((u) => {
+                const key = utxoKey(u);
+                const sel = picked.includes(key);
+                return (
+                  <button
+                    key={key}
+                    onClick={() =>
+                      setPicked((p) => (sel ? p.filter((x) => x !== key) : [...p, key]))
+                    }
+                    className={`p-3 border text-left transition-colors ${sel ? "border-bitcoin bg-bitcoin/10" : "border-border hover:border-bitcoin/40"}`}
+                  >
+                    <div className="font-mono text-[10px] text-muted-foreground">
+                      utxo · {u.confirmations}conf
+                    </div>
+                    <div className="font-display text-bitcoin text-lg">
+                      {(u.sats / 1e8).toFixed(4)}
+                    </div>
+                    <div className="font-mono text-[10px] text-muted-foreground/70">
+                      #{u.txid.slice(0, 8)}…
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+
+          <Card title="02 · destino e valor" desc="Para onde os sats vão?">
+            <label className="block mb-3">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                endereço
+              </div>
+              <input
+                value={dest}
+                onChange={(e) => setDest(e.target.value)}
+                placeholder="bcrt1q…"
+                className="w-full bg-background border border-border px-3 py-2 font-mono text-xs focus:outline-none focus:border-bitcoin"
+              />
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <label>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                  valor (sats)
+                </div>
+                <input
+                  type="number"
+                  value={amount || ""}
+                  onChange={(e) => setAmount(Number(e.target.value))}
+                  className="w-full bg-background border border-border px-3 py-2 font-mono text-sm focus:outline-none focus:border-bitcoin"
+                />
+              </label>
+              <label>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                  fee rate (sat/vB)
+                </div>
+                <input
+                  type="number"
+                  value={feeRate}
+                  onChange={(e) => setFeeRate(Number(e.target.value))}
+                  className="w-full bg-background border border-border px-3 py-2 font-mono text-sm focus:outline-none focus:border-bitcoin"
+                />
+              </label>
+            </div>
+          </Card>
+
+          <Card title="03 · revisar e assinar">
+            <div className="font-mono text-xs space-y-1.5">
+              <Row k="inputs selecionados" v={`${inputs.length} · ${totalIn.toLocaleString()} sat`} />
+              <Row k="output destino" v={`${amount.toLocaleString()} sat`} />
+              <Row k="output troco (estimado)" v={`${Math.max(change, 0).toLocaleString()} sat`} />
+              <Row k="vsize estimado" v={`${vsize} vB`} />
+              <Row k="taxa estimada" v={`${estimatedFee.toLocaleString()} sat`} highlight />
+            </div>
+            <div className="mt-2 font-mono text-[10px] text-muted-foreground/60">
+              * Bitcoin Core seleciona os inputs e taxa finais automaticamente
+            </div>
+            {error && (
+              <div className="mt-3 font-mono text-xs text-red-400">{error}</div>
+            )}
+            <div className="mt-4 flex gap-2">
+              <button
+                disabled={!valid}
+                onClick={broadcast}
+                className={`px-5 py-2.5 font-mono text-xs uppercase tracking-widest transition-colors ${valid ? "bg-bitcoin text-primary-foreground hover:bg-bitcoin-glow" : "bg-muted text-muted-foreground"}`}
+              >
+                {step === "sign"
+                  ? "assinando…"
+                  : step === "done"
+                    ? "transmitida ✓"
+                    : "assinar e transmitir"}
+              </button>
+              {step === "done" && (
+                <button
+                  onClick={reset}
+                  className="px-5 py-2.5 font-mono text-xs uppercase tracking-widest border border-border hover:border-foreground/40"
+                >
+                  nova tx
+                </button>
+              )}
+            </div>
+          </Card>
         </div>
-        <pre className="text-bitcoin/90 leading-relaxed whitespace-pre-wrap break-all">
-          {`{
+
+        <aside className="col-span-5 border border-border/70 bg-background/80 p-6 font-mono text-xs">
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
+            // raw transaction (preview)
+          </div>
+          <pre className="text-bitcoin/90 leading-relaxed whitespace-pre-wrap break-all">
+            {`{
   "version": 2,
-  "inputs": [${inputs.map((i) => `\n    { "txid": "${i.id}…", "value": ${i.sats} }`).join(",")}
+  "inputs": [${inputs.map((i) => `\n    { "txid": "${i.txid.slice(0, 16)}…", "vout": ${i.vout}, "value": ${i.sats} }`).join(",")}
   ],
   "outputs": [
-    { "to": "${dest.slice(0, 32)}…", "value": ${amount} }${
+    { "to": "${dest ? dest.slice(0, 32) + "…" : "<endereço>"}", "value": ${amount} }${
       change > 0
         ? `,
     { "to": "<change>", "value": ${change} }`
         : ""
     }
   ],
-  "fee": ${fee},
-  "vsize": ${vsize}${
+  "fee_rate": ${feeRate} sat/vB,
+  "vsize": ~${vsize} vB${
     txid
       ? `,
   "txid": "${txid}"`
       : ""
   }
 }`}
-        </pre>
-        {step === "done" && (
-          <div className="mt-4 pt-4 border-t border-border/40 text-signal-glow animate-fade-up">
-            ✓ broadcast em regtest · aguardando inclusão em bloco
-          </div>
-        )}
-      </aside>
+          </pre>
+          {step === "done" && (
+            <div className="mt-4 pt-4 border-t border-border/40 text-signal-glow animate-fade-up">
+              ✓ broadcast em regtest · aguardando inclusão em bloco
+            </div>
+          )}
+        </aside>
+      </div>
     </div>
   );
 }
@@ -191,6 +333,7 @@ function Card({
     </div>
   );
 }
+
 function Row({ k, v, highlight }: { k: string; v: string; highlight?: boolean }) {
   return (
     <div className="flex justify-between border-b border-border/40 py-1">

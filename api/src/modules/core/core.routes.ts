@@ -2,42 +2,19 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { regtest } from '../../lib/rpc.js';
 
-// Only safe read + regtest-write commands are allowed
+// Only commands exposed in the frontend terminal are allowed
 const ALLOWED = new Set([
-  'getblockchaininfo',
   'getblockcount',
-  'getblockhash',
-  'getblock',
-  'getblockheader',
-  'getbestblockhash',
-  'getchaintips',
-  'getdifficulty',
-  'getmempoolinfo',
+  'getblockchaininfo',
   'getrawmempool',
-  'getrawtransaction',
-  'decoderawtransaction',
-  'getmininginfo',
-  'getnetworkinfo',
-  'getnettotals',
-  'getwalletinfo',
-  'getbalance',
-  'getnewaddress',
-  'getaddressinfo',
-  'validateaddress',
-  'listunspent',
   'listwallets',
-  'listreceivedbyaddress',
-  'listtransactions',
-  'createwallet',
   'loadwallet',
-  'sendtoaddress',
+  'unloadwallet',
+  'getnewaddress',
+  'getbalance',
+  'listunspent',
   'generatetoaddress',
-  'generate',
-  'createrawtransaction',
-  'signrawtransactionwithwallet',
-  'sendrawtransaction',
-  'testmempoolaccept',
-  'estimatesmartfee',
+  'sendtoaddress',
 ]);
 
 // Commands blocked regardless of any allowlist

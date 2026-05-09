@@ -11,6 +11,7 @@ import { utxosRoutes } from "./modules/utxos/utxos.routes.js";
 import { coreRoutes } from "./modules/core/core.routes.js";
 import { sseRoutes } from "./modules/sse/sse.routes.js";
 import { initZMQ } from "./lib/zmq.js";
+import { seedRegtest } from "./services/seed.service.js";
 import { blocksService } from "./services/blocks.service.js";
 import { mempoolService } from "./services/mempool.service.js";
 import { networkService } from "./services/network.service.js";
@@ -102,3 +103,5 @@ app.log.info(`Bitcoin Lab API listening on :${config.PORT}`);
 
 await warmCache();
 await initZMQ();
+
+seedRegtest().catch((err) => app.log.warn({ err }, '[seed] regtest seed failed'));
