@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { BlockchainStrip } from "@/components/BlockchainStrip";
 import { NetworkStats } from "@/components/NetworkStats";
+import { BitcoinCoin3D } from "@/components/BitcoinCoin3D";
 
 export const metadata: Metadata = {
   title: "Bitcoin Caveman Lab — Aprenda Bitcoin na prática",
@@ -54,16 +55,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="xl:col-span-5">
-            <pre className="overflow-hidden font-mono text-[8px] leading-tight text-bitcoin/60 select-none sm:text-[10px]">{`
-        ╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱
-       │ ░░  ▒▒  ▓▓  ██  │
-       │  ◇  block #840k  │
-       │  ◆  ◆  ◆  ◆  ◆  │
-       │ utxo · utxo · utxo│
-        ╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱
-            verify · don't trust
-`}</pre>
+          <div className="xl:col-span-5 flex flex-col gap-4">
+            <div className="h-[280px] sm:h-[320px] xl:h-[360px]">
+              <BitcoinCoin3D />
+            </div>
             <NetworkStats />
           </div>
         </div>

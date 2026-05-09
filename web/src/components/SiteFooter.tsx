@@ -41,7 +41,17 @@ export function SiteFooter() {
     <footer className="border-t border-border/60 mt-32">
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-8 font-mono text-[11px] text-muted-foreground sm:px-6 md:flex-row md:items-center md:justify-between xl:px-8 xl:py-10">
         <span>// don't trust. verify.</span>
-        <span>caveman_lab v0.1 · open source · no kyc</span>
+        <span>
+          caveman_lab v0.1 ·{" "}
+          <a
+            href="https://github.com/Brendovisk/bitcoin-lab"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            open source
+          </a>{" "}
+          · no kyc
+        </span>
         <span>
           signet peers: <span className="text-signal">{peers ?? "—"}</span>
         </span>
