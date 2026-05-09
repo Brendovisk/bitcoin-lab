@@ -44,10 +44,13 @@ async function execRPC(
   }
 
   const { command, params } = parseCommand(c);
+  const walletName = typeof params[0] === "string" ? params[0] : undefined;
+  const walletContext = command === "unloadwallet" ? undefined : wallet;
+
   const res = await fetch(`${API}/api/rpc`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ command, params, ...(wallet ? { wallet } : {}) }),
+    body: JSON.stringify({ command, params, ...(walletContext ? { wallet: walletContext } : {}) }),
   });
 
   if (!res.ok) {
@@ -57,11 +60,8 @@ async function execRPC(
 
   const data = (await res.json()) as { result: unknown };
   const text =
-    typeof data.result === "object"
-      ? JSON.stringify(data.result, null, 2)
-      : String(data.result);
+    typeof data.result === "object" ? JSON.stringify(data.result, null, 2) : String(data.result);
 
-  const walletName = typeof params[0] === "string" ? params[0] : undefined;
   let newWallet: string | undefined;
   let unloadedWallet: string | undefined;
 
@@ -96,10 +96,7 @@ export function CoreTerminal({ paste }: { paste?: { cmd: string; seq: number } |
         if (loaded.length === 0) return;
         if (loaded.length === 1) {
           setWallet(loaded[0]);
-          setLines((l) => [
-            ...l,
-            { kind: "info", text: `→ carteira ativa: ${loaded[0]}` },
-          ]);
+          setLines((l) => [...l, { kind: "info", text: `→ carteira ativa: ${loaded[0]}` }]);
         } else {
           setWallet(loaded[0]);
           setLines((l) => [
@@ -175,11 +172,7 @@ export function CoreTerminal({ paste }: { paste?: { cmd: string; seq: number } |
           <span className="ml-3">~/bitcoin-core/regtest</span>
         </div>
         <div className="flex items-center gap-3">
-          {wallet && (
-            <span className="text-bitcoin">
-              wallet: {wallet}
-            </span>
-          )}
+          {wallet && <span className="text-bitcoin">wallet: {wallet}</span>}
           <span className="pulse-dot">node online</span>
         </div>
       </div>
