@@ -13,17 +13,17 @@ export default function BitcoinCorePage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <section className="mx-auto max-w-7xl w-full px-8 pt-16 pb-8">
-        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-bitcoin mb-4">
+      <section className="mx-auto max-w-7xl w-full px-4 pt-12 pb-6 sm:px-6 xl:px-8 xl:pt-16 xl:pb-8">
+        <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-bitcoin mb-4 sm:text-[11px] sm:tracking-[0.3em]">
           // estação vii
         </div>
-        <h1 className="font-display text-5xl font-light">Conversando com o nó</h1>
+        <h1 className="font-display text-4xl font-light sm:text-5xl">Conversando com o nó</h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
           O Bitcoin Core é o software que <em>é</em> o Bitcoin. Aqui você usa o mesmo terminal que
           devs usam pra falar com o protocolo — digite comandos, leia respostas reais.
         </p>
       </section>
-      <section className="mx-auto max-w-7xl w-full px-8 mt-4 pb-12">
+      <section className="mx-auto max-w-7xl w-full px-4 mt-4 pb-12 sm:px-6 xl:px-8">
         <CoreSection />
       </section>
       <SiteFooter />

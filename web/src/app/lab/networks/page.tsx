@@ -33,18 +33,18 @@ export default function NetworksPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <section className="mx-auto max-w-7xl w-full px-8 pt-16 pb-8">
-        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-bitcoin mb-4">
+      <section className="mx-auto max-w-7xl w-full px-4 pt-12 pb-6 sm:px-6 xl:px-8 xl:pt-16 xl:pb-8">
+        <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-bitcoin mb-4 sm:text-[11px] sm:tracking-[0.3em]">
           // estação vi
         </div>
-        <h1 className="font-display text-5xl font-light">Três redes, um protocolo</h1>
+        <h1 className="font-display text-4xl font-light sm:text-5xl">Três redes, um protocolo</h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
           Bitcoin não é uma rede só. Existem versões pra brincar, testar e usar de verdade. Aprenda
           nas duas primeiras antes de tocar na terceira.
         </p>
       </section>
 
-      <section className="mx-auto max-w-7xl w-full px-8 mt-4 grid grid-cols-3 gap-4">
+      <section className="mx-auto max-w-7xl w-full px-4 mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:px-6 xl:grid-cols-3 xl:px-8">
         {NETS.map((n) => (
           <div
             key={n.name}
@@ -67,15 +67,17 @@ export default function NetworksPage() {
         ))}
       </section>
 
-      <section className="mx-auto max-w-7xl w-full px-8 mt-12 border border-border/70 bg-card/30 p-8">
-        <div className="font-mono text-[10px] uppercase tracking-widest text-bitcoin mb-3">
-          // regra do caveman
+      <section className="mx-auto max-w-7xl w-full px-4 mt-8 sm:px-6 xl:mt-12 xl:px-0">
+        <div className="border border-border/70 bg-card/30 p-6 xl:p-8">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-bitcoin mb-3">
+            // regra do caveman
+          </div>
+          <p className="font-display text-xl leading-snug max-w-3xl sm:text-2xl">
+            Aprenda em <span className="text-bitcoin">regtest</span>. Confirme em{" "}
+            <span className="text-bitcoin">signet</span>. Só então toque em{" "}
+            <span className="text-bitcoin">mainnet</span> — devagar e com pouco sat.
+          </p>
         </div>
-        <p className="font-display text-2xl leading-snug max-w-3xl">
-          Aprenda em <span className="text-bitcoin">regtest</span>. Confirme em{" "}
-          <span className="text-bitcoin">signet</span>. Só então toque em{" "}
-          <span className="text-bitcoin">mainnet</span> — devagar e com pouco sat.
-        </p>
       </section>
       <SiteFooter />
     </div>

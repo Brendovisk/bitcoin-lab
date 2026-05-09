@@ -166,8 +166,8 @@ export function CoreTerminal({ paste }: { paste?: { cmd: string; seq: number } |
   }
 
   return (
-    <div className="border border-border/70 bg-background/80 font-mono text-sm">
-      <div className="border-b border-border/60 px-4 py-2 flex items-center justify-between text-[11px] text-muted-foreground">
+    <div className="border border-border/70 bg-background/80 font-mono text-xs sm:text-sm">
+      <div className="border-b border-border/60 px-3 py-2 flex flex-col gap-2 text-[11px] text-muted-foreground sm:px-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-destructive/70" />
           <span className="h-2 w-2 rounded-full bg-bitcoin/70" />
@@ -184,11 +184,11 @@ export function CoreTerminal({ paste }: { paste?: { cmd: string; seq: number } |
         </div>
       </div>
 
-      <div id="term-scroll" className="p-4 h-[420px] overflow-auto space-y-1">
+      <div id="term-scroll" className="p-3 h-[320px] overflow-auto space-y-1 sm:p-4 sm:h-[420px]">
         {lines.map((l, i) => (
           <pre
             key={i}
-            className={
+            className={`whitespace-pre-wrap wrap-break-word xl:whitespace-pre xl:break-normal ${
               l.kind === "in"
                 ? "text-bitcoin"
                 : l.kind === "err"
@@ -196,7 +196,7 @@ export function CoreTerminal({ paste }: { paste?: { cmd: string; seq: number } |
                   : l.kind === "info"
                     ? "text-muted-foreground"
                     : "text-foreground"
-            }
+            }`}
           >
             {l.text}
           </pre>

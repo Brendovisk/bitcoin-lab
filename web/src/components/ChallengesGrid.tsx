@@ -92,14 +92,14 @@ export function ChallengesGrid() {
   const [picked, setPicked] = useState<number | null>(null);
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {CHALLENGES.map((c) => {
         const isOpen = open === c.id;
         const isSolved = solved.includes(c.id);
         return (
           <div
             key={c.id}
-            className={`border ${isSolved ? "border-signal/60" : "border-border/70"} bg-card/30 p-5 transition-all ${isOpen ? "col-span-3 shadow-deep" : "hover:border-bitcoin/50"}`}
+            className={`border ${isSolved ? "border-signal/60" : "border-border/70"} bg-card/30 p-5 transition-all ${isOpen ? "sm:col-span-2 xl:col-span-3 shadow-deep" : "hover:border-bitcoin/50"}`}
           >
             <div className="flex items-start justify-between mb-3">
               <span className="font-mono text-[10px] text-muted-foreground tracking-widest">
@@ -127,7 +127,7 @@ export function ChallengesGrid() {
             ) : (
               <div className="mt-5 pt-4 border-t border-border/50 animate-fade-up">
                 <div className="font-mono text-[11px] text-muted-foreground mb-3">{c.q}</div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                   {c.options.map((o, i) => {
                     const correct = picked !== null && i === c.answer;
                     const wrong = picked === i && i !== c.answer;

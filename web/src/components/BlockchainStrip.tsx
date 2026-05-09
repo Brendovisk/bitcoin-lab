@@ -50,8 +50,8 @@ export function BlockchainStrip() {
   }, []);
 
   return (
-    <div className="border border-border/70 bg-card/30 p-6 scanline">
-      <div className="flex items-center justify-between mb-6">
+    <div className="border border-border/70 bg-card/30 p-4 scanline sm:p-6">
+      <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
             live · signet
@@ -74,7 +74,7 @@ export function BlockchainStrip() {
         {blocks.map((b, i) => (
           <div key={b.height} className="relative flex items-center shrink-0 animate-fade-up">
             <div
-              className={`w-44 border ${i === 0 ? "border-bitcoin animate-block" : "border-border"} bg-background/80 p-3`}
+              className={`w-40 border ${i === 0 ? "border-bitcoin animate-block" : "border-border"} bg-background/80 p-3 sm:w-44`}
             >
               <div className="font-mono text-[10px] text-muted-foreground tracking-widest">
                 BLOCK

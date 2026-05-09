@@ -13,22 +13,22 @@ export default function BlockchainPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <section className="mx-auto max-w-7xl w-full px-8 pt-16 pb-8">
-        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-bitcoin mb-4">
+      <section className="mx-auto max-w-7xl w-full px-4 pt-12 pb-6 sm:px-6 xl:px-8 xl:pt-16 xl:pb-8">
+        <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-bitcoin mb-4 sm:text-[11px] sm:tracking-[0.3em]">
           // módulo 01
         </div>
-        <h1 className="font-display text-5xl font-light">A blockchain</h1>
+        <h1 className="font-display text-4xl font-light sm:text-5xl">A blockchain</h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
           Uma fila de blocos. Cada bloco aponta para o anterior pelo hash. Mude um bit em qualquer
           lugar e a corrente inteira se quebra. É só isso — e é tudo.
         </p>
       </section>
 
-      <section className="mx-auto max-w-7xl w-full px-8 mt-4">
+      <section className="mx-auto max-w-7xl w-full px-4 mt-4 sm:px-6 xl:px-8">
         <BlockchainStrip />
       </section>
 
-      <section className="mx-auto max-w-7xl w-full px-8 mt-12 grid grid-cols-3 gap-4">
+      <section className="mx-auto max-w-7xl w-full px-4 mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:px-6 xl:mt-12 xl:grid-cols-3 xl:px-8">
         <Concept
           n="hash"
           title="SHA-256 duplo"

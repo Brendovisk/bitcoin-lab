@@ -83,7 +83,7 @@ export function MiningSim() {
   return (
     <>
       {toast && (
-        <div className="fixed top-5 right-5 z-50 border border-bitcoin/60 bg-background/95 backdrop-blur-sm p-4 shadow-lg font-mono text-xs max-w-xs animate-fade-up">
+        <div className="fixed left-4 right-4 top-4 z-50 border border-bitcoin/60 bg-background/95 backdrop-blur-sm p-4 shadow-lg font-mono text-xs animate-fade-up sm:left-auto sm:right-5 sm:top-5 sm:max-w-xs">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-bitcoin uppercase tracking-widest text-[10px] mb-1">bloco minerado</div>
@@ -101,7 +101,7 @@ export function MiningSim() {
         </div>
       )}
 
-      <div className="border border-border/70 bg-card/30 p-6 space-y-6">
+      <div className="border border-border/70 bg-card/30 p-4 space-y-6 sm:p-6">
         <div className="flex items-end justify-between gap-6 flex-wrap">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
@@ -112,7 +112,7 @@ export function MiningSim() {
               zero(s)
             </h3>
           </div>
-          <div className="flex items-center gap-3 font-mono text-xs">
+          <div className="flex w-full flex-wrap items-center gap-3 font-mono text-xs sm:w-auto">
             <span className="text-muted-foreground">dificuldade</span>
             <input
               type="range"
@@ -127,7 +127,7 @@ export function MiningSim() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 font-mono text-xs">
+        <div className="grid grid-cols-1 gap-4 font-mono text-xs sm:grid-cols-2">
           <Stat label="nonce" value={nonce.toLocaleString()} />
           <Stat label="target" value={`${target}…`} highlight />
         </div>
@@ -144,7 +144,7 @@ export function MiningSim() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <button
             onClick={() => setRunning((r) => !r)}
             className={`px-6 py-3 font-mono text-xs uppercase tracking-widest transition-colors ${running ? "bg-destructive text-destructive-foreground" : "bg-bitcoin text-primary-foreground hover:bg-bitcoin-glow"}`}
@@ -166,7 +166,7 @@ export function MiningSim() {
       </div>
 
       {/* Real regtest mining */}
-      <div className="border border-border/70 bg-card/30 p-6 mt-6 flex items-center justify-between gap-6 flex-wrap">
+      <div className="border border-border/70 bg-card/30 p-4 mt-6 flex flex-col gap-6 sm:p-6 xl:flex-row xl:items-center xl:justify-between xl:flex-wrap">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
             regtest
@@ -176,7 +176,7 @@ export function MiningSim() {
             Confirma todas as transações pendentes na mempool local e avança a chain.
           </p>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-stretch gap-2 sm:items-end">
           <button
             onClick={mineReal}
             disabled={mining}

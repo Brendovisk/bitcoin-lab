@@ -43,29 +43,37 @@ async function getStats(): Promise<NetworkStats> {
 
 async function getSignetStatus(): Promise<NodeStatus> {
   try {
-    const info = await signet.call<RawBlockchainInfo>('getblockchaininfo');
+    const [info, peers] = await Promise.all([
+      signet.call<RawBlockchainInfo>('getblockchaininfo'),
+      signet.call<number>('getconnectioncount'),
+    ]);
     return {
       online: true,
       chain: info.chain,
       blocks: info.blocks,
+      peers,
       synced: info.verificationprogress > 0.9999,
     };
   } catch {
-    return { online: false, chain: 'main', blocks: 0, synced: false };
+    return { online: false, chain: 'signet', blocks: 0, peers: 0, synced: false };
   }
 }
 
 async function getRegtestStatus(): Promise<NodeStatus> {
   try {
-    const info = await regtest.call<RawBlockchainInfo>('getblockchaininfo');
+    const [info, peers] = await Promise.all([
+      regtest.call<RawBlockchainInfo>('getblockchaininfo'),
+      regtest.call<number>('getconnectioncount'),
+    ]);
     return {
       online: true,
       chain: info.chain,
       blocks: info.blocks,
+      peers,
       synced: true,
     };
   } catch {
-    return { online: false, chain: 'regtest', blocks: 0, synced: false };
+    return { online: false, chain: 'regtest', blocks: 0, peers: 0, synced: false };
   }
 }
 

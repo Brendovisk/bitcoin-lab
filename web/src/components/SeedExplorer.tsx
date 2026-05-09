@@ -78,15 +78,15 @@ export function SeedExplorer() {
 
   return (
     <div className="space-y-6">
-      <div className="border border-border/70 bg-card/30 p-6">
-        <div className="flex items-center justify-between mb-5">
+      <div className="border border-border/70 bg-card/30 p-4 sm:p-6">
+        <div className="flex flex-col gap-4 mb-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
               BIP39 · 12 palavras
             </div>
             <h3 className="font-display text-xl">Sua semente</h3>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <button
               onClick={() => {
                 setWords(gen12());
@@ -114,7 +114,7 @@ export function SeedExplorer() {
         )}
 
         {words && (
-          <div className="grid grid-cols-4 gap-2 animate-fade-up">
+          <div className="grid grid-cols-2 gap-2 animate-fade-up sm:grid-cols-3 xl:grid-cols-4">
             {words.map((w, i) => (
               <div key={i} className="border border-border/70 px-3 py-2 font-mono text-sm">
                 <span className="text-muted-foreground/60 text-[10px] mr-2">
@@ -134,7 +134,7 @@ export function SeedExplorer() {
 
       {words && (
         <>
-          <div className="border border-border/70 bg-card/30 p-6 animate-fade-up">
+          <div className="border border-border/70 bg-card/30 p-4 animate-fade-up sm:p-6">
             <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
               extended public key (xpub)
             </div>
@@ -145,14 +145,14 @@ export function SeedExplorer() {
             </p>
           </div>
 
-          <div className="border border-border/70 bg-card/30 p-6 animate-fade-up">
+          <div className="border border-border/70 bg-card/30 p-4 animate-fade-up sm:p-6">
             <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
               endereços derivados (m/84'/0'/0'/0/n)
             </div>
             <div className="space-y-1 font-mono text-xs">
               {addrs.map((a) => (
-                <div key={a.path} className="flex gap-4 border-b border-border/40 py-1.5">
-                  <span className="text-muted-foreground w-32">{a.path}</span>
+                <div key={a.path} className="flex flex-col gap-1 border-b border-border/40 py-1.5 sm:flex-row sm:gap-4">
+                  <span className="text-muted-foreground sm:w-32">{a.path}</span>
                   <span className="text-foreground truncate">{a.addr}</span>
                 </div>
               ))}

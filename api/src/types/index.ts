@@ -25,6 +25,7 @@ export type NodeStatus = {
   online: boolean;
   chain: string;
   blocks: number;
+  peers: number;
   synced: boolean;
 };
 

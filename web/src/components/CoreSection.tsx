@@ -23,11 +23,11 @@ export function CoreSection() {
   const [paste, setPaste] = useState<{ cmd: string; seq: number } | null>(null);
 
   return (
-    <div className="grid grid-cols-12 gap-6">
-      <div className="col-span-8">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+      <div className="xl:col-span-8">
         <CoreTerminal paste={paste} />
       </div>
-      <aside className="col-span-4 border border-border/70 bg-card/30 p-5">
+      <aside className="border border-border/70 bg-card/30 p-5 xl:col-span-4">
         <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
           comandos para experimentar
         </div>

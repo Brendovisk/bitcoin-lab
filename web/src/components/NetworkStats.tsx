@@ -19,7 +19,7 @@ export function NetworkStats() {
   }, []);
 
   return (
-    <div className="mt-4 grid grid-cols-3 gap-3 font-mono text-[11px]">
+    <div className="mt-4 grid grid-cols-1 gap-3 font-mono text-[11px] sm:grid-cols-3">
       <Stat label="hashrate" value={stats.hashrate} />
       <Stat label="dificuldade" value={stats.difficulty} />
       <Stat label="próximo halving" value={stats.halvingDays > 0 ? `${stats.halvingDays}d` : "—"} />

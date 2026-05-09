@@ -54,17 +54,19 @@ export function SiteHeader() {
   const blockHeight = useCurrentBlock();
 
   const linkClass = (href: string, exact = false) => {
-    const isActive = exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
+    const isActive = exact
+      ? pathname === href
+      : pathname === href || pathname.startsWith(href + "/");
     return `hover:text-foreground transition-colors${isActive ? " text-foreground" : ""}`;
   };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-8">
+      <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 xl:h-16 xl:flex-nowrap xl:px-8 xl:py-0">
         <Link href="/" className="hover:opacity-80 transition-opacity">
           <Logo />
         </Link>
-        <nav className="flex items-center gap-7 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+        <nav className="order-3 flex w-full items-center gap-4 overflow-x-auto font-mono text-[11px] uppercase tracking-widest text-muted-foreground sm:gap-6 xl:order-0 xl:w-auto xl:gap-7 xl:text-xs">
           <Link href="/" className={linkClass("/", true)}>
             Manifesto
           </Link>
@@ -78,10 +80,10 @@ export function SiteHeader() {
             Desafios
           </Link>
         </nav>
-        <div className="flex items-center gap-3 font-mono text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-3 font-mono text-[11px] text-muted-foreground w-[11.625rem]">
           <span className="pulse-dot">regtest</span>
           <span className="text-border">|</span>
-          <span>
+          <span className="hidden sm:inline">
             block{" "}
             <span className="text-bitcoin">
               #{blockHeight > 0 ? blockHeight.toLocaleString("pt-BR") : "—"}

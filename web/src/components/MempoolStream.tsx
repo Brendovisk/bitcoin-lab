@@ -62,15 +62,15 @@ export function MempoolStream({ rows = 8 }: { rows?: number }) {
   }, [rows]);
 
   return (
-    <div className="border border-border/70 bg-card/30 p-6">
-      <div className="flex items-center justify-between mb-5">
+    <div className="border border-border/70 bg-card/30 p-4 sm:p-6">
+      <div className="flex flex-col gap-4 mb-5 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
             mempool · regtest · pending
           </div>
           <h3 className="font-display text-xl">Transações esperando confirmação</h3>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
           {txs.length > 0 && (
             <Link
               href="/lab/mining"
@@ -86,14 +86,14 @@ export function MempoolStream({ rows = 8 }: { rows?: number }) {
           </div>
         </div>
       </div>
-      <div className="space-y-1 font-mono text-xs min-h-[260px]">
+      <div className="space-y-1 font-mono text-[11px] min-h-[260px] sm:text-xs">
         {txs.length === 0 && <div className="text-muted-foreground/60">aguardando transações…</div>}
         {txs.map((t, i) => {
           const intensity = Math.min(t.fee / 80, 1);
           return (
             <div
               key={t.id}
-              className="group flex items-center justify-between border-b border-border/40 py-1.5 transition-colors hover:bg-bitcoin/5 animate-fade-up"
+              className="group flex flex-col gap-1 border-b border-border/40 py-2 transition-colors hover:bg-bitcoin/5 animate-fade-up sm:flex-row sm:items-center sm:justify-between sm:py-1.5"
               style={{ opacity: 1 - i * 0.06 }}
               title={`txid: ${t.id}\nvsize: ${t.vsize} vB\nfee: ${t.fee} sat/vB`}
             >
@@ -107,7 +107,7 @@ export function MempoolStream({ rows = 8 }: { rows?: number }) {
                 />
                 tx_{t.id}
               </span>
-              <div className="flex items-center gap-6">
+              <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-6">
                 <span className="text-muted-foreground/70 hidden md:inline">{t.vsize} vB</span>
                 <span className="text-foreground">{(t.sats / 1e8).toFixed(8)} BTC</span>
                 <span className="text-bitcoin w-20 text-right">{t.fee} sat/vB</span>

@@ -14,11 +14,11 @@ export default function LabIndex() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      <section className="mx-auto max-w-7xl px-8 pt-20 pb-12 border-b border-border/60">
-        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-bitcoin mb-6">
+      <section className="mx-auto max-w-7xl px-4 pt-14 pb-10 border-b border-border/60 sm:px-6 sm:pt-16 xl:px-8 xl:pt-20 xl:pb-12">
+        <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-bitcoin mb-5 sm:text-[11px] sm:tracking-[0.3em] xl:mb-6">
           // laboratório · v0.1
         </div>
-        <h1 className="font-display text-6xl font-light tracking-tight max-w-3xl">
+        <h1 className="font-display text-4xl font-light tracking-tight max-w-3xl sm:text-5xl xl:text-6xl">
           Nove estações para você <em className="text-bitcoin">enxergar</em> o Bitcoin.
         </h1>
         <p className="mt-6 text-muted-foreground max-w-2xl">
@@ -27,7 +27,7 @@ export default function LabIndex() {
         </p>
       </section>
 
-      <section className="mx-auto max-w-7xl px-8 mt-12 grid grid-cols-3 gap-4 pb-8">
+      <section className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-4 px-4 pb-8 sm:grid-cols-2 sm:px-6 xl:mt-12 xl:grid-cols-3 xl:px-8">
         {MODULES.map((m) => (
           <ModuleCard key={m.index} {...m} />
         ))}

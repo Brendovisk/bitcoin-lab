@@ -42,12 +42,12 @@ function AddressChip({ wallet }: { wallet: string }) {
     <button
       onClick={copy}
       title="clique para copiar endereço"
-      className="flex items-center gap-2 border border-border/60 bg-card/30 px-3 py-2 hover:border-bitcoin/50 transition-colors group"
+      className="flex max-w-full items-center gap-2 border border-border/60 bg-card/30 px-3 py-2 hover:border-bitcoin/50 transition-colors group"
     >
       <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
         endereço
       </span>
-      <span className="font-mono text-xs text-bitcoin truncate max-w-[260px]">{address}</span>
+      <span className="font-mono text-xs text-bitcoin truncate max-w-[150px] sm:max-w-[260px]">{address}</span>
       <span className="font-mono text-[10px] text-muted-foreground group-hover:text-bitcoin transition-colors">
         {copied ? "copiado ✓" : "copiar"}
       </span>
@@ -158,9 +158,9 @@ export function UtxoFlow() {
         {wallet && <AddressChip wallet={wallet} />}
       </div>
 
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-8 border border-border/70 bg-card/30 p-6">
-          <div className="flex justify-between mb-4">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+        <div className="border border-border/70 bg-card/30 p-4 sm:p-6 xl:col-span-8">
+          <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:justify-between">
             <div>
               <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 sua carteira · regtest
@@ -225,7 +225,7 @@ export function UtxoFlow() {
           )}
         </div>
 
-        <aside className="col-span-4 border border-border/70 bg-card/30 p-6 space-y-5">
+        <aside className="border border-border/70 bg-card/30 p-4 space-y-5 sm:p-6 xl:col-span-4">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
               construir transação

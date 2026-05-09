@@ -30,12 +30,12 @@ function AddressChip({ wallet }: { wallet: string }) {
     <button
       onClick={copy}
       title="clique para copiar endereço"
-      className="flex items-center gap-2 border border-border/60 bg-card/30 px-3 py-2 hover:border-bitcoin/50 transition-colors group"
+      className="flex max-w-full items-center gap-2 border border-border/60 bg-card/30 px-3 py-2 hover:border-bitcoin/50 transition-colors group"
     >
       <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
         endereço
       </span>
-      <span className="font-mono text-xs text-bitcoin truncate max-w-[260px]">{address}</span>
+      <span className="font-mono text-xs text-bitcoin truncate max-w-[150px] sm:max-w-[260px]">{address}</span>
       <span className="font-mono text-[10px] text-muted-foreground group-hover:text-bitcoin transition-colors">
         {copied ? "copiado ✓" : "copiar"}
       </span>
@@ -144,7 +144,7 @@ export function TxBuilder() {
   return (
     <>
     {toast && (
-      <div className="fixed top-5 right-5 z-50 border border-bitcoin/60 bg-background/95 backdrop-blur-sm p-4 shadow-lg font-mono text-xs max-w-xs animate-fade-up">
+      <div className="fixed left-4 right-4 top-4 z-50 border border-bitcoin/60 bg-background/95 backdrop-blur-sm p-4 shadow-lg font-mono text-xs animate-fade-up sm:left-auto sm:right-5 sm:top-5 sm:max-w-xs">
         <div className="flex items-start justify-between gap-4 mb-3">
           <div>
             <div className="text-bitcoin uppercase tracking-widest text-[10px] mb-1">tx na mempool</div>
@@ -193,8 +193,8 @@ export function TxBuilder() {
         )}
       </div>
 
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-7 space-y-4">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+        <div className="space-y-4 xl:col-span-7">
           <Card title="01 · escolha os inputs" desc="Quais pedaços você quer gastar?">
             {loading && (
               <div className="font-mono text-xs text-muted-foreground/60">carregando utxos…</div>
@@ -204,7 +204,7 @@ export function TxBuilder() {
                 nenhum utxo — aguardando seed da API ou reinicie o servidor
               </div>
             )}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
               {utxos.map((u) => {
                 const key = utxoKey(u);
                 const sel = picked.includes(key);
@@ -243,7 +243,7 @@ export function TxBuilder() {
                 className="w-full bg-background border border-border px-3 py-2 font-mono text-xs focus:outline-none focus:border-bitcoin"
               />
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label>
                 <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
                   valor (sats)
@@ -283,7 +283,7 @@ export function TxBuilder() {
             {error && (
               <div className="mt-3 font-mono text-xs text-red-400">{error}</div>
             )}
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
               <button
                 disabled={!valid}
                 onClick={broadcast}
@@ -307,7 +307,7 @@ export function TxBuilder() {
           </Card>
         </div>
 
-        <aside className="col-span-5 border border-border/70 bg-background/80 p-6 font-mono text-xs">
+        <aside className="border border-border/70 bg-background/80 p-4 font-mono text-[11px] sm:p-6 sm:text-xs xl:col-span-5">
           <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
             // raw transaction (preview)
           </div>

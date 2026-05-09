@@ -22,40 +22,40 @@ export default function Home() {
 
       {/* HERO */}
       <section className="relative bg-radial-glow">
-        <div className="mx-auto max-w-7xl px-8 pt-24 pb-20 grid grid-cols-12 gap-8 items-end">
-          <div className="col-span-7">
-            <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-bitcoin mb-8">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-end gap-8 px-4 pb-14 pt-16 sm:px-6 sm:pt-20 xl:grid-cols-12 xl:px-8 xl:pb-20 xl:pt-24">
+          <div className="xl:col-span-7">
+            <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-bitcoin mb-6 sm:text-[11px] sm:tracking-[0.3em] xl:mb-8">
               <span className="pulse-dot" />ϟ aprendizado soberano · sem kyc · sem mágica
             </div>
-            <h1 className="font-display text-7xl leading-[0.95] tracking-tight font-light">
+            <h1 className="font-display text-5xl leading-[0.98] tracking-tight font-light sm:text-6xl xl:text-7xl xl:leading-[0.95]">
               Bitcoin não deveria
               <br />
               parecer <span className="italic text-bitcoin">mágica.</span>
             </h1>
-            <p className="mt-8 text-lg text-muted-foreground max-w-xl leading-relaxed">
+            <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg xl:mt-8">
               O Caveman Lab é um <span className="text-foreground">laboratório interativo</span>{" "}
               para você ver, mexer e entender o que acontece por baixo das carteiras — blocos,
               UTXOs, mempool, mineração e autocustódia, na prática.
             </p>
-            <div className="mt-10 flex items-center gap-4">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 xl:mt-10">
               <Link
                 href="/lab"
-                className="group inline-flex items-center gap-3 bg-bitcoin px-6 py-3 font-mono text-xs uppercase tracking-widest text-primary-foreground hover:bg-bitcoin-glow transition-colors"
+                className="group inline-flex items-center justify-center gap-3 bg-bitcoin px-6 py-3 font-mono text-xs uppercase tracking-widest text-primary-foreground hover:bg-bitcoin-glow transition-colors"
               >
                 entrar no laboratório
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
               </Link>
               <Link
                 href="/lab/blockchain"
-                className="inline-flex items-center gap-3 border border-border px-6 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+                className="inline-flex items-center justify-center gap-3 border border-border px-6 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
               >
                 ver a blockchain
               </Link>
             </div>
           </div>
 
-          <div className="col-span-5">
-            <pre className="font-mono text-[10px] leading-tight text-bitcoin/60 select-none">{`
+          <div className="xl:col-span-5">
+            <pre className="overflow-hidden font-mono text-[8px] leading-tight text-bitcoin/60 select-none sm:text-[10px]">{`
         ╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱
        │ ░░  ▒▒  ▓▓  ██  │
        │  ◇  block #840k  │
@@ -70,23 +70,23 @@ export default function Home() {
       </section>
 
       {/* LIVE BLOCKS */}
-      <section className="mx-auto max-w-7xl mt-8">
+      <section className="mx-auto mt-8 w-full max-w-7xl px-4 sm:px-6 xl:px-0">
         <BlockchainStrip />
       </section>
 
       {/* PHILOSOPHY */}
-      <section className="mx-auto max-w-7xl px-8 mt-32 grid grid-cols-12 gap-8">
-        <div className="col-span-4">
-          <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-4">
+      <section className="mx-auto mt-20 grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 xl:mt-32 xl:grid-cols-12 xl:px-8">
+        <div className="xl:col-span-4">
+          <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground mb-4 sm:text-[11px] sm:tracking-[0.3em]">
             // filosofia
           </div>
-          <h2 className="font-display text-4xl font-light leading-tight">
+          <h2 className="font-display text-3xl font-light leading-tight sm:text-4xl">
             Aprenda
             <br />
             como um <em className="text-bitcoin not-italic">caveman</em>:
           </h2>
         </div>
-        <div className="col-span-8 grid grid-cols-2 gap-x-12 gap-y-10">
+        <div className="grid grid-cols-1 gap-x-12 gap-y-8 sm:grid-cols-2 xl:col-span-8 xl:gap-y-10">
           {PRINCIPLES.map((p) => (
             <div key={p.title}>
               <div className="font-mono text-bitcoin text-xs mb-2">{p.tag}</div>
@@ -98,12 +98,12 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="mx-auto max-w-7xl px-8 mt-32">
-        <div className="border border-border/70 bg-card/40 p-12 text-center bg-radial-glow">
-          <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-bitcoin mb-6">
+      <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6 xl:mt-32 xl:px-8">
+        <div className="border border-border/70 bg-card/40 p-6 text-center bg-radial-glow sm:p-8 xl:p-12">
+          <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-bitcoin mb-6 sm:text-[11px] sm:tracking-[0.3em]">
             // próxima estação
           </div>
-          <h2 className="font-display text-5xl font-light mb-4">
+          <h2 className="font-display text-3xl font-light mb-4 sm:text-4xl xl:text-5xl">
             Pegue uma pedra. Comece a quebrar.
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto mb-8">
@@ -112,7 +112,7 @@ export default function Home() {
           </p>
           <Link
             href="/lab"
-            className="inline-flex items-center gap-3 bg-bitcoin px-8 py-4 font-mono text-xs uppercase tracking-widest text-primary-foreground hover:bg-bitcoin-glow transition-colors"
+            className="inline-flex items-center justify-center gap-3 bg-bitcoin px-6 py-3 font-mono text-xs uppercase tracking-widest text-primary-foreground hover:bg-bitcoin-glow transition-colors sm:px-8 sm:py-4"
           >
             abrir o laboratório →
           </Link>
