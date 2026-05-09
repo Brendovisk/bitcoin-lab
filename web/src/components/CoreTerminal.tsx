@@ -4,59 +4,58 @@ import { useEffect, useState } from "react";
 
 type Line = { kind: "in" | "out" | "info" | "err"; text: string };
 
-const HEX = "0123456789abcdef";
-const rand = (n: number) =>
-  Array.from({ length: n }, () => HEX[Math.floor(Math.random() * 16)]).join("");
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
-function exec(cmd: string): Line[] {
+function parseCommand(raw: string): { command: string; params: unknown[] } {
+  const parts = raw.trim().split(/\s+/);
+  const command = parts[0];
+  const args = parts.slice(1);
+
+  const params: unknown[] = args.map((a) => {
+    const n = Number(a);
+    if (!isNaN(n) && a !== "") return n;
+    if (a === "true") return true;
+    if (a === "false") return false;
+    return a;
+  });
+
+  return { command, params };
+}
+
+async function execRPC(cmd: string): Promise<Line[]> {
   const c = cmd.trim();
   if (!c) return [];
-  if (c === "help") {
-    return [
-      { kind: "info", text: "comandos disponíveis:" },
-      { kind: "info", text: "  getblockchaininfo · getblockcount · getrawmempool" },
-      { kind: "info", text: "  getnewaddress · generatetoaddress N <addr>" },
-      { kind: "info", text: "  sendtoaddress <addr> <btc> · getbalance · clear" },
-    ];
-  }
   if (c === "clear") return [{ kind: "info", text: "__CLEAR__" }];
-  if (c === "getblockcount")
-    return [{ kind: "out", text: String(840219 + Math.floor(Math.random() * 8)) }];
-  if (c === "getbalance") return [{ kind: "out", text: (Math.random() * 4 + 0.1).toFixed(8) }];
-  if (c === "getnewaddress") return [{ kind: "out", text: `bcrt1q${rand(38)}` }];
-  if (c.startsWith("generatetoaddress")) {
-    const n = Number(c.split(/\s+/)[1] || 1);
+  if (c === "help") {
+    const res = await fetch(`${API}/api/rpc/commands`);
+    const data = (await res.json()) as { commands: string[] };
     return [
-      {
-        kind: "out",
-        text: `[ ${Array.from({ length: Math.min(n, 5) }, () => `"${rand(64)}"`).join(", ")}${n > 5 ? ", …" : ""} ]`,
-      },
+      { kind: "info", text: "comandos disponíveis (regtest):" },
+      { kind: "info", text: "  " + data.commands.join(" · ") },
+      { kind: "info", text: "" },
+      { kind: "info", text: "uso: <command> [arg1] [arg2] ..." },
+      { kind: "info", text: "ex:  generatetoaddress 10 bcrt1q..." },
     ];
   }
-  if (c === "getrawmempool") {
-    return [
-      { kind: "out", text: `[ ${Array.from({ length: 4 }, () => `"${rand(64)}"`).join(", ")} ]` },
-    ];
+
+  const { command, params } = parseCommand(c);
+  const res = await fetch(`${API}/api/rpc`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ command, params }),
+  });
+
+  if (!res.ok) {
+    const err = (await res.json()) as { error: string };
+    return [{ kind: "err", text: err.error ?? `HTTP ${res.status}` }];
   }
-  if (c === "getblockchaininfo") {
-    return [
-      {
-        kind: "out",
-        text: `{
-  "chain": "regtest",
-  "blocks": ${840219 + Math.floor(Math.random() * 8)},
-  "headers": ${840219 + Math.floor(Math.random() * 8)},
-  "difficulty": 0.000244,
-  "verificationprogress": 1,
-  "pruned": false
-}`,
-      },
-    ];
-  }
-  if (c.startsWith("sendtoaddress")) {
-    return [{ kind: "out", text: rand(64) }];
-  }
-  return [{ kind: "err", text: `comando desconhecido: "${c}". digite "help".` }];
+
+  const data = (await res.json()) as { result: unknown };
+  const text =
+    typeof data.result === "object"
+      ? JSON.stringify(data.result, null, 2)
+      : String(data.result);
+  return [{ kind: "out", text }];
 }
 
 const INTRO: Line[] = [
@@ -69,20 +68,31 @@ export function CoreTerminal() {
   const [input, setInput] = useState("");
   const [hist, setHist] = useState<string[]>([]);
   const [hi, setHi] = useState(-1);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const el = document.getElementById("term-scroll");
     if (el) el.scrollTop = el.scrollHeight;
   }, [lines]);
 
-  function submit() {
-    if (!input.trim()) return;
-    const out = exec(input);
-    if (out[0]?.text === "__CLEAR__") setLines(INTRO);
-    else setLines((l) => [...l, { kind: "in", text: `$ ${input}` }, ...out]);
-    setHist((h) => [input, ...h]);
+  async function submit() {
+    if (!input.trim() || loading) return;
+    const cmd = input;
+    setLines((l) => [...l, { kind: "in", text: `$ ${cmd}` }]);
+    setHist((h) => [cmd, ...h]);
     setHi(-1);
     setInput("");
+    setLoading(true);
+
+    try {
+      const out = await execRPC(cmd);
+      if (out[0]?.text === "__CLEAR__") setLines(INTRO);
+      else setLines((l) => [...l, ...out]);
+    } catch (err) {
+      setLines((l) => [...l, { kind: "err", text: String(err) }]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -117,14 +127,15 @@ export function CoreTerminal() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          submit();
+          void submit();
         }}
         className="border-t border-border/60 px-4 py-2 flex items-center gap-2"
       >
-        <span className="text-bitcoin">$</span>
+        <span className={`text-bitcoin ${loading ? "animate-pulse" : ""}`}>$</span>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          disabled={loading}
           onKeyDown={(e) => {
             if (e.key === "ArrowUp") {
               e.preventDefault();
@@ -138,7 +149,7 @@ export function CoreTerminal() {
               setInput(n === -1 ? "" : hist[n]);
             }
           }}
-          className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground/50"
+          className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground/50 disabled:opacity-50"
           placeholder='tente "getblockcount" ou "generatetoaddress 3 bcrt1q..."'
           autoFocus
         />

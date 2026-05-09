@@ -4,24 +4,43 @@ import { useEffect, useState } from "react";
 
 type Tx = { id: string; sats: number; fee: number; vsize: number };
 
-const hex = "0123456789abcdef";
-const mkId = () => Array.from({ length: 16 }, () => hex[Math.floor(Math.random() * 16)]).join("");
-const mkTx = (): Tx => ({
-  id: mkId(),
-  sats: Math.floor(Math.random() * 5000000) + 10000,
-  fee: Math.floor(Math.random() * 80) + 2,
-  vsize: 140 + Math.floor(Math.random() * 380),
-});
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export function MempoolStream({ rows = 8 }: { rows?: number }) {
   const [txs, setTxs] = useState<Tx[]>([]);
+  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    setTxs(Array.from({ length: rows }, mkTx));
-    const id = setInterval(() => {
-      setTxs((prev) => [mkTx(), ...prev.slice(0, rows - 1)]);
-    }, 1800);
-    return () => clearInterval(id);
+    let es: EventSource | null = null;
+    let dead = false;
+
+    function connect() {
+      if (dead) return;
+      es = new EventSource(`${API}/api/sse/mempool`);
+
+      es.addEventListener("init", (e) => {
+        const data = JSON.parse(e.data) as { txs: Tx[] };
+        setTxs(data.txs.slice(0, rows));
+        setConnected(true);
+      });
+
+      es.addEventListener("tx", (e) => {
+        const tx = JSON.parse(e.data) as Tx;
+        setTxs((prev) => [tx, ...prev.slice(0, rows - 1)]);
+      });
+
+      es.onerror = () => {
+        setConnected(false);
+        es?.close();
+        setTimeout(connect, 5_000);
+      };
+    }
+
+    connect();
+    return () => {
+      dead = true;
+      es?.close();
+    };
   }, [rows]);
 
   return (
@@ -29,11 +48,15 @@ export function MempoolStream({ rows = 8 }: { rows?: number }) {
       <div className="flex items-center justify-between mb-5">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-            mempool · pending
+            mempool · mainnet · pending
           </div>
           <h3 className="font-display text-xl">Transações esperando confirmação</h3>
         </div>
-        <div className="font-mono text-[11px] text-bitcoin">{txs.length * 312} sat/vB total</div>
+        <div className={`font-mono text-[11px] ${connected ? "text-bitcoin" : "text-muted-foreground"}`}>
+          {connected
+            ? `${txs.reduce((s, t) => s + t.fee, 0)} sat/vB total`
+            : "conectando…"}
+        </div>
       </div>
       <div className="space-y-1 font-mono text-xs min-h-[260px]">
         {txs.length === 0 && <div className="text-muted-foreground/60">aguardando transações…</div>}

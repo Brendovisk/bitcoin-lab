@@ -10,32 +10,43 @@ type Block = {
   time: string;
 };
 
-const HEX = "0123456789abcdef";
-function rand(len: number) {
-  let s = "";
-  for (let i = 0; i < len; i++) s += HEX[Math.floor(Math.random() * 16)];
-  return s;
-}
-
-function makeBlock(h: number): Block {
-  return {
-    height: h,
-    hash: "0000000000000000000" + rand(45),
-    txs: 1800 + Math.floor(Math.random() * 1500),
-    size: (1.2 + Math.random() * 0.6).toFixed(2) + " MB",
-    time: Math.floor(Math.random() * 9 + 1) + "min",
-  };
-}
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export function BlockchainStrip() {
   const [blocks, setBlocks] = useState<Block[]>([]);
+  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    setBlocks(Array.from({ length: 5 }, (_, i) => makeBlock(840219 - i)));
-    const id = setInterval(() => {
-      setBlocks((b) => (b.length ? [makeBlock(b[0].height + 1), ...b.slice(0, 4)] : b));
-    }, 8000);
-    return () => clearInterval(id);
+    let es: EventSource | null = null;
+    let dead = false;
+
+    function connect() {
+      if (dead) return;
+      es = new EventSource(`${API}/api/sse/blocks`);
+
+      es.addEventListener("init", (e) => {
+        const data = JSON.parse(e.data) as { blocks: Block[] };
+        setBlocks(data.blocks);
+        setConnected(true);
+      });
+
+      es.addEventListener("block", (e) => {
+        const block = JSON.parse(e.data) as Block;
+        setBlocks((prev) => [block, ...prev.slice(0, 4)]);
+      });
+
+      es.onerror = () => {
+        setConnected(false);
+        es?.close();
+        setTimeout(connect, 5_000);
+      };
+    }
+
+    connect();
+    return () => {
+      dead = true;
+      es?.close();
+    };
   }, []);
 
   return (
@@ -43,11 +54,13 @@ export function BlockchainStrip() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-            live · regtest visualization
+            live · mainnet
           </div>
           <h3 className="font-display text-xl">A blockchain, em tempo real</h3>
         </div>
-        <div className="font-mono text-[11px] text-signal pulse-dot">sincronizado</div>
+        <div className={`font-mono text-[11px] ${connected ? "text-signal pulse-dot" : "text-muted-foreground"}`}>
+          {connected ? "sincronizado" : "conectando…"}
+        </div>
       </div>
 
       <div className="flex items-stretch gap-2 overflow-x-auto pb-2 min-h-[170px]">

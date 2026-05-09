@@ -2,10 +2,56 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
+
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+
+function useCurrentBlock(): number {
+  const [height, setHeight] = useState(0);
+
+  useEffect(() => {
+    let es: EventSource | null = null;
+    let dead = false;
+
+    async function init() {
+      try {
+        const res = await fetch(`${API}/api/status/block`);
+        const data = (await res.json()) as { height: number };
+        if (data.height) setHeight(data.height);
+      } catch {
+        // node offline
+      }
+    }
+
+    function connect() {
+      if (dead) return;
+      es = new EventSource(`${API}/api/sse/status`);
+      es.addEventListener("block-height", (e) => {
+        const data = JSON.parse(e.data) as { height: number };
+        setHeight(data.height);
+      });
+      es.onerror = () => {
+        es?.close();
+        setTimeout(connect, 10_000);
+      };
+    }
+
+    void init();
+    connect();
+
+    return () => {
+      dead = true;
+      es?.close();
+    };
+  }, []);
+
+  return height;
+}
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const blockHeight = useCurrentBlock();
 
   const linkClass = (href: string, exact = false) => {
     const isActive = exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
@@ -36,7 +82,10 @@ export function SiteHeader() {
           <span className="pulse-dot">regtest</span>
           <span className="text-border">|</span>
           <span>
-            block <span className="text-bitcoin">#840.219</span>
+            block{" "}
+            <span className="text-bitcoin">
+              #{blockHeight > 0 ? blockHeight.toLocaleString("pt-BR") : "—"}
+            </span>
           </span>
         </div>
       </div>
