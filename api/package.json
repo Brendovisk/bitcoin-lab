@@ -1,0 +1,15 @@
+{
+  "name": "@bitcoin-lab/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'API not implemented yet'",
+    "build": "echo 'API not implemented yet'",
+    "start": "echo 'API not implemented yet'"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.16.5",
+    "typescript": "^5.8.3"
+  }
+}
