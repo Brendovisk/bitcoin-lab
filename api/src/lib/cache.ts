@@ -1,4 +1,4 @@
-import type { Block, MempoolTx } from '../types/index.js';
+import type { Block, MempoolTx } from "../types/index.js";
 
 const MAX_BLOCKS = 5;
 const MAX_TXS = 8;

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Tx = { id: string; sats: number; fee: number; vsize: number };
@@ -13,6 +14,17 @@ export function MempoolStream({ rows = 8 }: { rows?: number }) {
   useEffect(() => {
     let es: EventSource | null = null;
     let dead = false;
+
+    async function refreshMempool() {
+      try {
+        const res = await fetch(`${API}/api/mempool/txs`, { cache: "no-store" });
+        if (!res.ok || dead) return;
+        const data = (await res.json()) as { txs: Tx[] };
+        setTxs(data.txs.slice(0, rows));
+      } catch {
+        // SSE remains the primary live feed; polling only reconciles stale state.
+      }
+    }
 
     function connect() {
       if (dead) return;
@@ -37,9 +49,15 @@ export function MempoolStream({ rows = 8 }: { rows?: number }) {
     }
 
     connect();
+    void refreshMempool();
+    const poll = setInterval(() => {
+      void refreshMempool();
+    }, 5_000);
+
     return () => {
       dead = true;
       es?.close();
+      clearInterval(poll);
     };
   }, [rows]);
 
@@ -48,14 +66,24 @@ export function MempoolStream({ rows = 8 }: { rows?: number }) {
       <div className="flex items-center justify-between mb-5">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-            mempool · signet · pending
+            mempool · regtest · pending
           </div>
           <h3 className="font-display text-xl">Transações esperando confirmação</h3>
         </div>
-        <div className={`font-mono text-[11px] ${connected ? "text-bitcoin" : "text-muted-foreground"}`}>
-          {connected
-            ? `${txs.reduce((s, t) => s + t.fee, 0)} sat/vB total`
-            : "conectando…"}
+        <div className="flex items-center gap-4">
+          {txs.length > 0 && (
+            <Link
+              href="/lab/mining"
+              className="font-mono text-[10px] uppercase tracking-widest border border-bitcoin/50 text-bitcoin px-3 py-1.5 hover:bg-bitcoin/10 transition-colors"
+            >
+              minerar agora →
+            </Link>
+          )}
+          <div
+            className={`font-mono text-[11px] ${connected ? "text-bitcoin" : "text-muted-foreground"}`}
+          >
+            {connected ? `${txs.reduce((s, t) => s + t.fee, 0)} sat/vB total` : "conectando…"}
+          </div>
         </div>
       </div>
       <div className="space-y-1 font-mono text-xs min-h-[260px]">

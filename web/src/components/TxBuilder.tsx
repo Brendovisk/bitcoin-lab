@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
@@ -69,6 +70,7 @@ export function TxBuilder() {
   const [step, setStep] = useState<Step>("select");
   const [txid, setTxid] = useState("");
   const [error, setError] = useState("");
+  const [toast, setToast] = useState(false);
 
   useEffect(() => {
     fetch(`${API}/api/wallets`)
@@ -131,6 +133,8 @@ export function TxBuilder() {
       if (!res.ok || !data.txid) throw new Error(data.error ?? "Erro ao transmitir");
       setTxid(data.txid);
       setStep("done");
+      setToast(true);
+      setTimeout(() => setToast(false), 7000);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro desconhecido");
       setStep("select");
@@ -138,6 +142,32 @@ export function TxBuilder() {
   }
 
   return (
+    <>
+    {toast && (
+      <div className="fixed top-5 right-5 z-50 border border-bitcoin/60 bg-background/95 backdrop-blur-sm p-4 shadow-lg font-mono text-xs max-w-xs animate-fade-up">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div>
+            <div className="text-bitcoin uppercase tracking-widest text-[10px] mb-1">tx na mempool</div>
+            <div className="text-foreground leading-relaxed">
+              Transação transmitida. Aguardando ser incluída em um bloco.
+            </div>
+          </div>
+          <button
+            onClick={() => setToast(false)}
+            className="text-muted-foreground hover:text-foreground transition-colors mt-0.5 shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+        <Link
+          href="/lab/mempool"
+          onClick={() => setToast(false)}
+          className="block w-full text-center py-2 border border-bitcoin/50 text-bitcoin hover:bg-bitcoin/10 transition-colors uppercase tracking-widest text-[10px]"
+        >
+          ver mempool →
+        </Link>
+      </div>
+    )}
     <div className="space-y-4">
       <div className="flex items-center gap-3 flex-wrap">
         <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -311,6 +341,7 @@ export function TxBuilder() {
         </aside>
       </div>
     </div>
+    </>
   );
 }
 

@@ -1,11 +1,11 @@
-import { EventEmitter } from 'node:events';
-import type { Block, MempoolTx } from '../types/index.js';
+import { EventEmitter } from "node:events";
+import type { Block, MempoolTx } from "../types/index.js";
 
 type Events = {
   block: [block: Block];
   tx: [tx: MempoolTx];
-  'signet:status': [online: boolean];
-  'regtest:status': [online: boolean];
+  "signet:status": [online: boolean];
+  "regtest:status": [online: boolean];
 };
 
 class TypedEmitter extends EventEmitter {
