@@ -4,18 +4,18 @@ import { cache } from '../../lib/cache.js';
 
 export async function statusRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/status', async () => {
-    const [mainnet, regtest] = await Promise.all([
-      networkService.getMainnetStatus(),
+    const [signet, regtest] = await Promise.all([
+      networkService.getSignetStatus(),
       networkService.getRegtestStatus(),
     ]);
 
-    cache.setMainnetOnline(mainnet.online);
+    cache.setSignetOnline(signet.online);
     cache.setRegtestOnline(regtest.online);
 
-    return { mainnet, regtest };
+    return { signet, regtest };
   });
 
   app.get('/api/status/block', async () => {
-    return { height: cache.mainnetBlock };
+    return { height: cache.signetBlock };
   });
 }

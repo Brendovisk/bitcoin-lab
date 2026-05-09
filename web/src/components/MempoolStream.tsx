@@ -48,7 +48,7 @@ export function MempoolStream({ rows = 8 }: { rows?: number }) {
       <div className="flex items-center justify-between mb-5">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-            mempool · mainnet · pending
+            mempool · signet · pending
           </div>
           <h3 className="font-display text-xl">Transações esperando confirmação</h3>
         </div>

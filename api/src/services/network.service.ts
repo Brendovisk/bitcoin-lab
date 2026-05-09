@@ -1,4 +1,4 @@
-import { mainnet, regtest } from '../lib/rpc.js';
+import { signet, regtest } from '../lib/rpc.js';
 import type { NetworkStats, NodeStatus, RawBlockchainInfo, RawMiningInfo } from '../types/index.js';
 
 const HALVING_INTERVAL = 210_000;
@@ -28,8 +28,8 @@ function halvingDays(currentHeight: number): number {
 
 async function getStats(): Promise<NetworkStats> {
   const [info, mining] = await Promise.all([
-    mainnet.call<RawBlockchainInfo>('getblockchaininfo'),
-    mainnet.call<RawMiningInfo>('getmininginfo'),
+    signet.call<RawBlockchainInfo>('getblockchaininfo'),
+    signet.call<RawMiningInfo>('getmininginfo'),
   ]);
 
   return {
@@ -41,9 +41,9 @@ async function getStats(): Promise<NetworkStats> {
   };
 }
 
-async function getMainnetStatus(): Promise<NodeStatus> {
+async function getSignetStatus(): Promise<NodeStatus> {
   try {
-    const info = await mainnet.call<RawBlockchainInfo>('getblockchaininfo');
+    const info = await signet.call<RawBlockchainInfo>('getblockchaininfo');
     return {
       online: true,
       chain: info.chain,
@@ -69,4 +69,5 @@ async function getRegtestStatus(): Promise<NodeStatus> {
   }
 }
 
-export const networkService = { getStats, getMainnetStatus, getRegtestStatus };
+export const networkService = { getStats, getSignetStatus, getRegtestStatus };
+

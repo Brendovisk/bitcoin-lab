@@ -10,9 +10,6 @@ function openSSE(req: FastifyRequest, reply: FastifyReply): ServerResponse {
   const allowOrigin =
     origin === config.CORS_ORIGIN ? origin : config.CORS_ORIGIN;
 
-  // writeHead flushes status + headers immediately to the socket.
-  // This must happen before reply.hijack() so headers reach the client
-  // before Fastify's pipeline (including CORS plugin) can interfere.
   reply.raw.writeHead(200, {
     'Access-Control-Allow-Origin': allowOrigin,
     'Vary': 'Origin',
@@ -21,13 +18,19 @@ function openSSE(req: FastifyRequest, reply: FastifyReply): ServerResponse {
     'Connection': 'keep-alive',
     'X-Accel-Buffering': 'no',
   });
-
   reply.hijack();
+  // flushHeaders sends the buffered status line + headers to the socket immediately.
+  // Without this, routes that send no initial event (e.g. /sse/status) never transmit
+  // HTTP headers and the browser sees "can't establish connection".
+  reply.raw.flushHeaders();
+
   return reply.raw;
 }
 
 function send(raw: ServerResponse, event: string, data: unknown): void {
-  raw.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+  if (!raw.destroyed && !raw.writableEnded) {
+    raw.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+  }
 }
 
 function keepAlive(raw: ServerResponse): NodeJS.Timeout {
@@ -72,18 +75,23 @@ export async function sseRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/sse/status', (req, reply) => {
     const raw = openSSE(req, reply);
 
+    // Send current state immediately so Firefox doesn't close a silent connection
+    send(raw, 'signet-status', { online: cache.signetOnline });
+    send(raw, 'regtest-status', { online: cache.regtestOnline });
+    if (cache.signetBlock > 0) send(raw, 'block-height', { height: cache.signetBlock });
+
     const onBlock = (block: Block) => send(raw, 'block-height', { height: block.height });
-    const onMainnet = (online: boolean) => send(raw, 'mainnet-status', { online });
+    const onMainnet = (online: boolean) => send(raw, 'signet-status', { online });
     const onRegtest = (online: boolean) => send(raw, 'regtest-status', { online });
 
     bus.on('block', onBlock);
-    bus.on('mainnet:status', onMainnet);
+    bus.on('signet:status', onMainnet);
     bus.on('regtest:status', onRegtest);
     const timer = keepAlive(raw);
 
     onClose(req, () => {
       bus.off('block', onBlock);
-      bus.off('mainnet:status', onMainnet);
+      bus.off('signet:status', onMainnet);
       bus.off('regtest:status', onRegtest);
       clearInterval(timer);
     });

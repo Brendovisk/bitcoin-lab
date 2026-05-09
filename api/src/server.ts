@@ -57,14 +57,14 @@ async function warmCache(): Promise<void> {
     const [blocks, txs, status] = await Promise.allSettled([
       blocksService.getLatestBlocks(5),
       mempoolService.getLatestTxs(8),
-      networkService.getMainnetStatus(),
+      networkService.getSignetStatus(),
     ]);
 
     if (blocks.status === "fulfilled") {
       cache.setBlocks(blocks.value);
       app.log.info({ count: blocks.value.length }, "[cache] blocks loaded");
     } else {
-      app.log.warn("[cache] mainnet blocks unavailable — is mainnet node running?");
+      app.log.warn("[cache] signet blocks unavailable — is signet node running?");
     }
 
     if (txs.status === "fulfilled") {
@@ -73,8 +73,8 @@ async function warmCache(): Promise<void> {
     }
 
     if (status.status === "fulfilled") {
-      cache.setMainnetOnline(status.value.online);
-      bus.emit("mainnet:status", status.value.online);
+      cache.setSignetOnline(status.value.online);
+      bus.emit("signet:status", status.value.online);
     }
   } catch (err) {
     app.log.warn({ err }, "[cache] warm failed");
@@ -83,13 +83,13 @@ async function warmCache(): Promise<void> {
 
 // Status polling every 60s
 setInterval(async () => {
-  const [mainnet, regtest] = await Promise.allSettled([
-    networkService.getMainnetStatus(),
+  const [signet, regtest] = await Promise.allSettled([
+    networkService.getSignetStatus(),
     networkService.getRegtestStatus(),
   ]);
-  if (mainnet.status === "fulfilled") {
-    cache.setMainnetOnline(mainnet.value.online);
-    bus.emit("mainnet:status", mainnet.value.online);
+  if (signet.status === "fulfilled") {
+    cache.setSignetOnline(signet.value.online);
+    bus.emit("signet:status", signet.value.online);
   }
   if (regtest.status === "fulfilled") {
     cache.setRegtestOnline(regtest.value.online);

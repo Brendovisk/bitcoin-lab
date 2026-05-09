@@ -1,4 +1,4 @@
-import { mainnet } from '../lib/rpc.js';
+import { signet } from '../lib/rpc.js';
 import type { MempoolTx, RawMempoolVerbose, RawTransaction } from '../types/index.js';
 
 function toSatoshis(btc: number): number {
@@ -8,8 +8,8 @@ function toSatoshis(btc: number): number {
 async function getTx(txid: string): Promise<MempoolTx | null> {
   try {
     const [entry, raw] = await Promise.all([
-      mainnet.call<{ vsize: number; fees: { base: number } }>('getmempoolentry', [txid]),
-      mainnet.call<RawTransaction>('getrawtransaction', [txid, true]),
+      signet.call<{ vsize: number; fees: { base: number } }>('getmempoolentry', [txid]),
+      signet.call<RawTransaction>('getrawtransaction', [txid, true]),
     ]);
 
     const feeSats = toSatoshis(entry.fees.base);
@@ -28,7 +28,7 @@ async function getTx(txid: string): Promise<MempoolTx | null> {
 }
 
 async function getLatestTxs(count = 8): Promise<MempoolTx[]> {
-  const mempool = await mainnet.call<RawMempoolVerbose>('getrawmempool', [true]);
+  const mempool = await signet.call<RawMempoolVerbose>('getrawmempool', [true]);
   const entries = Object.entries(mempool)
     .sort(([, a], [, b]) => b.time - a.time)
     .slice(0, count * 2); // fetch extra to account for failures

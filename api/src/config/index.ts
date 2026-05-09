@@ -4,10 +4,10 @@ import { z } from 'zod';
 const Schema = z.object({
   PORT: z.coerce.number().default(3001),
 
-  MAINNET_RPC_HOST: z.string().default('127.0.0.1'),
-  MAINNET_RPC_PORT: z.coerce.number().default(8332),
-  MAINNET_RPC_USER: z.string().default('dev'),
-  MAINNET_RPC_PASS: z.string().default('devpass'),
+  SIGNET_RPC_HOST: z.string().default('127.0.0.1'),
+  SIGNET_RPC_PORT: z.coerce.number().default(8332),
+  SIGNET_RPC_USER: z.string().default('dev'),
+  SIGNET_RPC_PASS: z.string().default('devpass'),
 
   REGTEST_RPC_HOST: z.string().default('127.0.0.1'),
   REGTEST_RPC_PORT: z.coerce.number().default(18443),

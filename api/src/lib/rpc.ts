@@ -59,11 +59,11 @@ class BitcoinRPC {
   }
 }
 
-export const mainnet = new BitcoinRPC({
-  host: config.MAINNET_RPC_HOST,
-  port: config.MAINNET_RPC_PORT,
-  user: config.MAINNET_RPC_USER,
-  pass: config.MAINNET_RPC_PASS,
+export const signet = new BitcoinRPC({
+  host: config.SIGNET_RPC_HOST,
+  port: config.SIGNET_RPC_PORT,
+  user: config.SIGNET_RPC_USER,
+  pass: config.SIGNET_RPC_PASS,
 });
 
 export const regtest = new BitcoinRPC({

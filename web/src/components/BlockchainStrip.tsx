@@ -54,7 +54,7 @@ export function BlockchainStrip() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-            live · mainnet
+            live · signet
           </div>
           <h3 className="font-display text-xl">A blockchain, em tempo real</h3>
         </div>

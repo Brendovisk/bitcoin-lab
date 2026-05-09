@@ -67,13 +67,13 @@ async function startPolling(): Promise<void> {
   async function pollBlocks() {
     try {
       const blocks = await blocksService.getLatestBlocks(5);
-      if (blocks.length > 0 && blocks[0].height !== cache.mainnetBlock) {
+      if (blocks.length > 0 && blocks[0].height !== cache.signetBlock) {
         const newBlock = blocks[0];
         cache.pushBlock(newBlock);
         bus.emit('block', newBlock);
       }
     } catch {
-      // mainnet may be offline
+      // signet may be offline
     }
   }
 
@@ -87,7 +87,7 @@ async function startPolling(): Promise<void> {
         }
       });
     } catch {
-      // mainnet may be offline
+      // signet may be offline
     }
   }
 
