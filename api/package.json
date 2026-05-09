@@ -1,15 +1,24 @@
 {
   "name": "@bitcoin-lab/api",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "scripts": {
-    "dev": "echo 'API not implemented yet'",
-    "build": "echo 'API not implemented yet'",
-    "start": "echo 'API not implemented yet'"
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.28.1",
+    "zeromq": "^6.0.0-beta.17",
+    "zod": "^3.23.8"
+  },
   "devDependencies": {
-    "@types/node": "^22.16.5",
+    "@types/node": "^22.5.0",
+    "tsx": "^4.17.0",
     "typescript": "^5.8.3"
   }
 }
