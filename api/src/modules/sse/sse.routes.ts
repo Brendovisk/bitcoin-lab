@@ -74,23 +74,18 @@ export async function sseRoutes(app: FastifyInstance): Promise<void> {
   app.get("/api/sse/status", (req, reply) => {
     const raw = openSSE(req, reply);
 
-    // Send current state immediately so Firefox doesn't close a silent connection
-    send(raw, "signet-status", { online: cache.signetOnline });
     send(raw, "regtest-status", { online: cache.regtestOnline });
-    if (cache.signetBlock > 0) send(raw, "block-height", { height: cache.signetBlock });
+    if (cache.regtestBlock > 0) send(raw, "block-height", { height: cache.regtestBlock });
 
     const onBlock = (block: Block) => send(raw, "block-height", { height: block.height });
-    const onMainnet = (online: boolean) => send(raw, "signet-status", { online });
     const onRegtest = (online: boolean) => send(raw, "regtest-status", { online });
 
     bus.on("block", onBlock);
-    bus.on("signet:status", onMainnet);
     bus.on("regtest:status", onRegtest);
     const timer = keepAlive(raw);
 
     onClose(req, () => {
       bus.off("block", onBlock);
-      bus.off("signet:status", onMainnet);
       bus.off("regtest:status", onRegtest);
       clearInterval(timer);
     });

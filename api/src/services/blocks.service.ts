@@ -1,4 +1,4 @@
-import { signet } from '../lib/rpc.js';
+import { regtest } from '../lib/rpc.js';
 import type { Block, RawBlock, RawBlockchainInfo } from '../types/index.js';
 
 function formatAge(timestamp: number): string {
@@ -24,15 +24,15 @@ function toBlock(raw: RawBlock): Block {
 }
 
 async function getLatestBlocks(count = 5): Promise<Block[]> {
-  const info = await signet.call<RawBlockchainInfo>('getblockchaininfo');
+  const info = await regtest.call<RawBlockchainInfo>('getblockchaininfo');
   const tipHeight = info.blocks;
 
   const blocks: Block[] = [];
   for (let i = 0; i < count; i++) {
     const height = tipHeight - i;
     if (height < 0) break;
-    const hash = await signet.call<string>('getblockhash', [height]);
-    const raw = await signet.call<RawBlock>('getblock', [hash, 1]);
+    const hash = await regtest.call<string>('getblockhash', [height]);
+    const raw = await regtest.call<RawBlock>('getblock', [hash, 1]);
     blocks.push(toBlock(raw));
   }
 
@@ -41,7 +41,7 @@ async function getLatestBlocks(count = 5): Promise<Block[]> {
 
 async function getBlockByHash(hash: string): Promise<Block | null> {
   try {
-    const raw = await signet.call<RawBlock>('getblock', [hash, 1]);
+    const raw = await regtest.call<RawBlock>('getblock', [hash, 1]);
     return toBlock(raw);
   } catch {
     return null;
@@ -49,7 +49,7 @@ async function getBlockByHash(hash: string): Promise<Block | null> {
 }
 
 async function getCurrentHeight(): Promise<number> {
-  return signet.call<number>('getblockcount');
+  return regtest.call<number>('getblockcount');
 }
 
 export const blocksService = { getLatestBlocks, getBlockByHash, getCurrentHeight };

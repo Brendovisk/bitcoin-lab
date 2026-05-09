@@ -82,13 +82,13 @@ async function startPolling(): Promise<void> {
   async function pollBlocks() {
     try {
       const blocks = await blocksService.getLatestBlocks(6);
-      if (blocks.length > 0 && blocks[0].height !== cache.signetBlock) {
+      if (blocks.length > 0 && blocks[0].height !== cache.regtestBlock) {
         const newBlock = blocks[0];
         cache.pushBlock(newBlock);
         bus.emit("block", newBlock);
       }
     } catch {
-      // signet may be offline
+      // regtest may be offline
     }
   }
 

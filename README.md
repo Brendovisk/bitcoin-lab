@@ -7,7 +7,7 @@
 
 ## O que é isso?
 
-O **Caveman Lab** é um ambiente de aprendizado que conecta uma interface moderna a nós Bitcoin reais (signet + regtest). Você não lê sobre blocos — você vê eles chegando. Você não estuda UTXOs num slide — você assiste inputs sendo consumidos e outputs nascendo.
+O **Caveman Lab** é um ambiente de aprendizado que conecta uma interface moderna a um nó Bitcoin real (regtest). Você não lê sobre blocos — você vê eles chegando. Você não estuda UTXOs num slide — você assiste inputs sendo consumidos e outputs nascendo.
 
 Tudo roda localmente. Sem KYC. Sem mágica.
 
@@ -56,8 +56,7 @@ Monorepo com npm workspaces. Um `npm run dev` sobe os dois.
 
 **Bitcoin**
 - Bitcoin Core via JSON-RPC
-- Signet (leitura — rede pública de testes)
-- Regtest (escrita — sua rede local)
+- Regtest (leitura + escrita — sua rede local)
 
 ---
 
@@ -66,7 +65,7 @@ Monorepo com npm workspaces. Um `npm run dev` sobe os dois.
 ### Pré-requisitos
 
 - Node.js 20+
-- Bitcoin Core rodando (signet + regtest)
+- Bitcoin Core rodando em modo regtest
 
 ### 1. Clone e instale
 
@@ -86,11 +85,6 @@ Edite `api/.env` com os dados do seu Bitcoin Core:
 
 ```env
 PORT=3001
-
-SIGNET_RPC_HOST=127.0.0.1
-SIGNET_RPC_PORT=38332
-SIGNET_RPC_USER=dev
-SIGNET_RPC_PASS=devpass
 
 REGTEST_RPC_HOST=127.0.0.1
 REGTEST_RPC_PORT=18443
@@ -131,7 +125,7 @@ npm run build        # build completo
 
 ```
 01 / ver       → Cada bloco, UTXO e assinatura renderizados na tela. Sem caixas-pretas.
-02 / mexer     → Tudo em regtest e signet. Quebre coisas, reinicie, mine blocos sozinho.
+02 / mexer     → Tudo em regtest. Quebre coisas, reinicie, mine blocos sozinho.
 03 / entender  → Conceitos explicados como na fogueira. Direto, visual, prático.
 04 / soberano  → Seeds BIP39, derivação de chaves, assinatura local. Suas chaves, seu Bitcoin.
 ```
@@ -140,7 +134,6 @@ npm run build        # build completo
 
 ## Segurança
 
-- **Mainnet/Signet** → somente leitura
 - **Regtest** → leitura + escrita (rede local isolada)
 - Comandos RPC expostos pela API passam por whitelist — os destrutivos estão bloqueados
 

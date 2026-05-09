@@ -1,4 +1,4 @@
-import { signet, regtest } from '../lib/rpc.js';
+import { regtest } from '../lib/rpc.js';
 import type { NetworkStats, NodeStatus, RawBlockchainInfo, RawMiningInfo } from '../types/index.js';
 
 const HALVING_INTERVAL = 210_000;
@@ -28,8 +28,8 @@ function halvingDays(currentHeight: number): number {
 
 async function getStats(): Promise<NetworkStats> {
   const [info, mining] = await Promise.all([
-    signet.call<RawBlockchainInfo>('getblockchaininfo'),
-    signet.call<RawMiningInfo>('getmininginfo'),
+    regtest.call<RawBlockchainInfo>('getblockchaininfo'),
+    regtest.call<RawMiningInfo>('getmininginfo'),
   ]);
 
   return {
@@ -39,24 +39,6 @@ async function getStats(): Promise<NetworkStats> {
     nextHalvingBlock: nextHalvingBlock(info.blocks),
     currentBlock: info.blocks,
   };
-}
-
-async function getSignetStatus(): Promise<NodeStatus> {
-  try {
-    const [info, peers] = await Promise.all([
-      signet.call<RawBlockchainInfo>('getblockchaininfo'),
-      signet.call<number>('getconnectioncount'),
-    ]);
-    return {
-      online: true,
-      chain: info.chain,
-      blocks: info.blocks,
-      peers,
-      synced: info.verificationprogress > 0.9999,
-    };
-  } catch {
-    return { online: false, chain: 'signet', blocks: 0, peers: 0, synced: false };
-  }
 }
 
 async function getRegtestStatus(): Promise<NodeStatus> {
@@ -77,5 +59,5 @@ async function getRegtestStatus(): Promise<NodeStatus> {
   }
 }
 
-export const networkService = { getStats, getSignetStatus, getRegtestStatus };
+export const networkService = { getStats, getRegtestStatus };
 

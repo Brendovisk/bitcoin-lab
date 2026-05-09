@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 type StatusResponse = {
-  signet?: {
+  regtest?: {
     peers?: number;
   };
 };
@@ -21,7 +21,7 @@ export function SiteFooter() {
         const res = await fetch(`${API}/api/status`, { cache: "no-store" });
         const data = (await res.json()) as StatusResponse;
         if (!dead) {
-          setPeers(typeof data.signet?.peers === "number" ? data.signet.peers : null);
+          setPeers(typeof data.regtest?.peers === "number" ? data.regtest.peers : null);
         }
       } catch {
         if (!dead) setPeers(null);
@@ -53,7 +53,7 @@ export function SiteFooter() {
           · no kyc
         </span>
         <span>
-          signet peers: <span className="text-signal">{peers ?? "—"}</span>
+          regtest peers: <span className="text-signal">{peers ?? "—"}</span>
         </span>
       </div>
     </footer>

@@ -58,14 +58,14 @@ async function warmCache(): Promise<void> {
     const [blocks, txs, status] = await Promise.allSettled([
       blocksService.getLatestBlocks(6),
       mempoolService.getLatestTxs(8),
-      networkService.getSignetStatus(),
+      networkService.getRegtestStatus(),
     ]);
 
     if (blocks.status === "fulfilled") {
       cache.setBlocks(blocks.value);
       app.log.info({ count: blocks.value.length }, "[cache] blocks loaded");
     } else {
-      app.log.warn("[cache] signet blocks unavailable — is signet node running?");
+      app.log.warn("[cache] regtest blocks unavailable — is regtest node running?");
     }
 
     if (txs.status === "fulfilled") {
@@ -74,8 +74,8 @@ async function warmCache(): Promise<void> {
     }
 
     if (status.status === "fulfilled") {
-      cache.setSignetOnline(status.value.online);
-      bus.emit("signet:status", status.value.online);
+      cache.setRegtestOnline(status.value.online);
+      bus.emit("regtest:status", status.value.online);
     }
   } catch (err) {
     app.log.warn({ err }, "[cache] warm failed");
@@ -84,17 +84,10 @@ async function warmCache(): Promise<void> {
 
 // Status polling every 60s
 setInterval(async () => {
-  const [signet, regtest] = await Promise.allSettled([
-    networkService.getSignetStatus(),
-    networkService.getRegtestStatus(),
-  ]);
-  if (signet.status === "fulfilled") {
-    cache.setSignetOnline(signet.value.online);
-    bus.emit("signet:status", signet.value.online);
-  }
-  if (regtest.status === "fulfilled") {
-    cache.setRegtestOnline(regtest.value.online);
-    bus.emit("regtest:status", regtest.value.online);
+  const regtest = await networkService.getRegtestStatus().catch(() => null);
+  if (regtest) {
+    cache.setRegtestOnline(regtest.online);
+    bus.emit("regtest:status", regtest.online);
   }
 }, 60_000);
 

@@ -4,7 +4,6 @@ import type { Block, MempoolTx } from "../types/index.js";
 type Events = {
   block: [block: Block];
   tx: [tx: MempoolTx];
-  "signet:status": [online: boolean];
   "regtest:status": [online: boolean];
 };
 

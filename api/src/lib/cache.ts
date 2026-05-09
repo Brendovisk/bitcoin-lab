@@ -6,8 +6,7 @@ const MAX_TXS = 8;
 class Cache {
   private _blocks: Block[] = [];
   private _txs: MempoolTx[] = [];
-  private _signetBlock = 0;
-  private _signetOnline = false;
+  private _regtestBlock = 0;
   private _regtestOnline = false;
 
   get blocks(): Block[] {
@@ -18,12 +17,8 @@ class Cache {
     return this._txs;
   }
 
-  get signetBlock(): number {
-    return this._signetBlock;
-  }
-
-  get signetOnline(): boolean {
-    return this._signetOnline;
+  get regtestBlock(): number {
+    return this._regtestBlock;
   }
 
   get regtestOnline(): boolean {
@@ -32,13 +27,13 @@ class Cache {
 
   pushBlock(block: Block): void {
     this._blocks = [block, ...this._blocks.slice(0, MAX_BLOCKS - 1)];
-    this._signetBlock = block.height;
+    this._regtestBlock = block.height;
   }
 
   setBlocks(blocks: Block[]): void {
     this._blocks = blocks.slice(0, MAX_BLOCKS);
     if (blocks.length > 0) {
-      this._signetBlock = blocks[0].height;
+      this._regtestBlock = blocks[0].height;
     }
   }
 
@@ -51,10 +46,6 @@ class Cache {
 
   setTxs(txs: MempoolTx[]): void {
     this._txs = txs.slice(0, MAX_TXS);
-  }
-
-  setSignetOnline(v: boolean): void {
-    this._signetOnline = v;
   }
 
   setRegtestOnline(v: boolean): void {
