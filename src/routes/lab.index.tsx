@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ModuleCard } from "@/components/ModuleCard";
 
-export const Route = createFileRoute("/lab")({
+export const Route = createFileRoute("/lab/")({
   head: () => ({
     meta: [
       { title: "Laboratório — Bitcoin Caveman Lab" },
