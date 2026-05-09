@@ -49,30 +49,37 @@ function buildFaceTexture(front: boolean): HTMLCanvasElement {
     ctx.fill();
   }
 
+  // The CylinderGeometry UV mapping combined with rotation.x = PI/2 causes
+  // the canvas top to appear on the right side of the screen (90° CW rotation).
+  // Pre-compensate by rotating all text content -90° (CCW) in canvas space.
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-Math.PI / 2);
+
   if (front) {
-    ctx.save();
     ctx.shadowColor = "rgba(255, 180, 60, 0.9)";
     ctx.shadowBlur = 28;
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 290px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("₿", cx + 2, cy + 14);
-    ctx.restore();
+    ctx.fillText("₿", 2, 14);
   } else {
     ctx.fillStyle = "rgba(255,255,255,0.88)";
     ctx.font = "bold 56px monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("21,000,000", cx, cy - 24);
+    ctx.fillText("21,000,000", 0, -24);
     ctx.fillStyle = "rgba(255,255,255,0.5)";
     ctx.font = "26px monospace";
-    ctx.fillText("BTC · MAX SUPPLY", cx, cy + 36);
+    ctx.fillText("BTC · MAX SUPPLY", 0, 36);
     ctx.fillStyle = "rgba(255,255,255,0.22)";
     ctx.font = "bold 60px Arial";
-    ctx.fillText("₿", cx, cy - 100);
-    ctx.fillText("₿", cx, cy + 120);
+    ctx.fillText("₿", 0, -100);
+    ctx.fillText("₿", 0, 120);
   }
+
+  ctx.restore();
 
   return canvas;
 }
@@ -104,7 +111,7 @@ export function BitcoinCoin3D() {
       const camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 50);
       camera.position.set(0, 0, 5.5);
 
-      const geo = new THREE.CylinderGeometry(1.6, 1.6, 0.14, 80);
+      const geo = new THREE.CylinderGeometry(1.6, 1.6, 0.26, 80);
       const frontTex = new THREE.CanvasTexture(buildFaceTexture(true));
       const backTex = new THREE.CanvasTexture(buildFaceTexture(false));
 
