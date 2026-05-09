@@ -77,11 +77,7 @@ npm install
 
 ### 2. Configure o ambiente da API
 
-```bash
-cp api/.env.example api/.env
-```
-
-Edite `api/.env` com os dados do seu Bitcoin Core:
+Crie `api/.env` com os dados do seu Bitcoin Core local:
 
 ```env
 PORT=3001
@@ -118,6 +114,46 @@ npm run dev:web      # só o frontend
 npm run dev:api      # só a API
 npm run build        # build completo
 ```
+
+---
+
+## Deploy (produção)
+
+A stack de produção roda com Docker Compose — um container para o Bitcoin Core (regtest) e outro para a API.
+
+### Pré-requisitos
+
+- Docker + Docker Compose v2
+
+### 1. Configure as variáveis
+
+O `docker-compose.yml` lê as variáveis `BITCOIN_RPC_USER`, `BITCOIN_RPC_PASS` e `CORS_ORIGIN` do ambiente. Em produção, defina-as diretamente no painel do Dokploy (Environment Variables). Para rodar localmente com Docker:
+
+```bash
+BITCOIN_RPC_USER=dev BITCOIN_RPC_PASS=devpass CORS_ORIGIN=https://seu-app.vercel.app docker compose up -d --build
+```
+
+### 2. Sobe a stack
+
+```bash
+docker compose up -d --build
+```
+
+O container da API aguarda o Bitcoin Core passar no healthcheck antes de iniciar.
+
+| Serviço | URL |
+|---------|-----|
+| API | http://seu-servidor:3001 |
+
+### Estrutura Docker
+
+```
+docker-compose.yml        → orquestra bitcoin-core + api
+api/Dockerfile            → build multi-stage da API (Node 22)
+.dockerignore             → exclui web/, node_modules/, dist/
+```
+
+O dado da blockchain regtest é persistido no volume `bitcoin-data` e sobrevive a restarts.
 
 ---
 

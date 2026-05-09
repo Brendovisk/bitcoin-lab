@@ -1,0 +1,10 @@
+web/
+node_modules/
+api/node_modules/
+api/dist/
+.git/
+.gitignore
+*.md
+**/.env
+**/.env.local
+**/.env.example

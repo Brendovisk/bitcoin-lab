@@ -20,6 +20,9 @@ web/out/
 # API build output
 api/dist/
 
+# Environment files
+api/.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
