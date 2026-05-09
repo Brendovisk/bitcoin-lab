@@ -81,7 +81,7 @@ async function startPolling(): Promise<void> {
 
   async function pollBlocks() {
     try {
-      const blocks = await blocksService.getLatestBlocks(5);
+      const blocks = await blocksService.getLatestBlocks(6);
       if (blocks.length > 0 && blocks[0].height !== cache.signetBlock) {
         const newBlock = blocks[0];
         cache.pushBlock(newBlock);

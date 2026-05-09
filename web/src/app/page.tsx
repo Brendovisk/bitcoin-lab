@@ -70,7 +70,7 @@ export default function Home() {
       </section>
 
       {/* LIVE BLOCKS */}
-      <section className="mx-auto max-w-7xl px-8 mt-8">
+      <section className="mx-auto max-w-7xl mt-8">
         <BlockchainStrip />
       </section>
 

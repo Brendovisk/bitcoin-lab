@@ -8,7 +8,7 @@ export async function blocksRoutes(app: FastifyInstance): Promise<void> {
     if (cache.blocks.length > 0) {
       return { blocks: cache.blocks };
     }
-    const blocks = await blocksService.getLatestBlocks(5);
+    const blocks = await blocksService.getLatestBlocks(6);
     cache.setBlocks(blocks);
     return { blocks };
   });

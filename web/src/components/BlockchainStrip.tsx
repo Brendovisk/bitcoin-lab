@@ -32,7 +32,7 @@ export function BlockchainStrip() {
 
       es.addEventListener("block", (e) => {
         const block = JSON.parse(e.data) as Block;
-        setBlocks((prev) => [block, ...prev.slice(0, 4)]);
+        setBlocks((prev) => [block, ...prev.slice(0, 5)]);
       });
 
       es.onerror = () => {
@@ -58,7 +58,9 @@ export function BlockchainStrip() {
           </div>
           <h3 className="font-display text-xl">A blockchain, em tempo real</h3>
         </div>
-        <div className={`font-mono text-[11px] ${connected ? "text-signal pulse-dot" : "text-muted-foreground"}`}>
+        <div
+          className={`font-mono text-[11px] ${connected ? "text-signal pulse-dot" : "text-muted-foreground"}`}
+        >
           {connected ? "sincronizado" : "conectando…"}
         </div>
       </div>

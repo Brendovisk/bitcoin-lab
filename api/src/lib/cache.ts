@@ -1,6 +1,6 @@
 import type { Block, MempoolTx } from "../types/index.js";
 
-const MAX_BLOCKS = 5;
+const MAX_BLOCKS = 6;
 const MAX_TXS = 8;
 
 class Cache {

@@ -56,7 +56,7 @@ await app.register(sseRoutes);
 async function warmCache(): Promise<void> {
   try {
     const [blocks, txs, status] = await Promise.allSettled([
-      blocksService.getLatestBlocks(5),
+      blocksService.getLatestBlocks(6),
       mempoolService.getLatestTxs(8),
       networkService.getSignetStatus(),
     ]);
