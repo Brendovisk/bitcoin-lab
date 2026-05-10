@@ -31,8 +31,7 @@ services:
 
   api:
     build:
-      context: .
-      dockerfile: api/Dockerfile
+      context: ./api
     restart: unless-stopped
     ports:
       - "3001:3001"
