@@ -1,6 +1,8 @@
 services:
   bitcoin-core:
     image: lncm/bitcoind:v27.0
+    env_file:
+      - /api/.env
     restart: unless-stopped
     volumes:
       - bitcoin-data:/data/.bitcoin
